@@ -1,0 +1,8 @@
+# Ignore .env files
+.env
+
+# Editor files
+.idea
+
+# Ignore vendor lib
+vendor
