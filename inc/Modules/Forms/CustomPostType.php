@@ -31,10 +31,6 @@ class CustomPostType extends BaseController
     {
         $this->settings = new SettingsApi();
 
-//        $this->callbacks = new AdminCallbacks();
-
-//        $this->setSubpages();
-
         $this->settings->addSubPages( $this->subpages )->init();
 
         $this->storeCustomPostTypes();
@@ -140,24 +136,5 @@ class CustomPostType extends BaseController
 
             }
         }
-
-
-//        switch ( $column ) {
-//
-//
-//
-//            case 'book_author' :
-//                $terms = get_the_term_list( $post_id , 'book_author' , '' , ',' , '' );
-//                if ( is_string( $terms ) )
-//                    echo $terms;
-//                else
-//                    _e( 'Unable to get author(s)', 'your_text_domain' );
-//                break;
-//
-//            case 'publisher' :
-//                echo get_post_meta( $post_id , 'publisher' , true );
-//                break;
-//
-//        }
     }
 }
