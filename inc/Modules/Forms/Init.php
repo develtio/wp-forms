@@ -26,7 +26,7 @@ class Init extends BaseController {
     public static function get_services()
     {
         return [
-            CustomPostType::class,
+//            CustomPostType::class,
         ];
     }
 
