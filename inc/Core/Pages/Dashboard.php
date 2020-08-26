@@ -33,7 +33,7 @@ class Dashboard extends BaseController
 
         $this->pages = [
             [
-                'page_title' => 'Develtio pugin',
+                'page_title' => 'Develtio plugin',
                 'menu_title' => 'Develtio',
                 'capability' => 'manage_options',
                 'menu_slug' => 'develtio_plugin',
