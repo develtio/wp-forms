@@ -6,36 +6,22 @@
 namespace Develtio\Modules\Forms;
 
 use Develtio\Core\Base\BaseController;
-use Develtio\Core\Api\SettingsApi;
-use Develtio\Core\Api\Callbacks\AdminCallbacks;
 use Develtio\Core\Api\MetaBoxApi;
 
 class CustomPostType extends BaseController
 {
 
-    public $settings;
-
-    public $subpages = [];
-
     public $post_type_name;
 
     public $meta_box;
 
-    public $callbacks;
-
     public $custom_post_types = [];
 
-    public $form_values;
+    public $form_components;
 
-    public function init()
-    {
-        $this->settings = new SettingsApi();
+    protected $post_type_prefix = 'df_';
 
-        $this->settings->addSubPages( $this->subpages )->init();
-
-        $this->storeCustomPostTypes();
-
-    }
+    protected $displayed_types = ['text', 'email'];
 
     public function registerCustomPostTypes()
     {
@@ -46,10 +32,13 @@ class CustomPostType extends BaseController
 
     }
 
-    public function storeCustomPostTypes( $post_type_name, $form_values )
+    /**
+     * @param $instance
+     */
+    public function storeCustomPostTypes( CreateForm $instance  )
     {
-        $this->post_type_name = str_replace( '-', '_', sanitize_title_with_dashes( $post_type_name ) );
-        $this->form_values = $form_values;
+        $this->post_type_name = $this->post_type_prefix . str_replace( '-', '_', $instance->form_slug );
+        $this->form_components = $instance->form->getComponents();
 
         if ( strlen( $this->post_type_name ) > 20 ) {
             var_dump( 'Length of form name must be smaller than 15 chars' );
@@ -58,15 +47,17 @@ class CustomPostType extends BaseController
 
         array_push( $this->custom_post_types,
             [
-                'name' => 'df_' . $this->post_type_name,
+                'name' => $this->post_type_name,
                 'args' => [
                     'labels' => [
-                        'name' => $post_type_name . ' form',
-                        'singular_name' => $post_type_name . ' form'
+                        'name' => $instance->form_name . ' form',
+                        'singular_name' => $instance->form_name . ' form'
                     ],
                     'public' => true,
                     'has_archive' => false,
-                    'show_in_menu' => 'develtio_plugin'
+                    'supports' => [ 'editor' => false ],
+                    'show_in_menu' => 'develtio_plugin',
+                    'position' => 10
                 ]
             ]
         );
@@ -79,45 +70,38 @@ class CustomPostType extends BaseController
                 [
                     'id' => 'form_fields',
                     'title' => 'Form fields',
-                    'post_type' => 'df_' . $this->post_type_name,
+                    'post_type' => $this->post_type_name,
                 ],
-                $this->form_values
+                $this->form_components
             );
 
-            add_filter( 'manage_' . 'df_' . $this->post_type_name . '_posts_columns', [ $this, 'setTableColumns' ] );
-            add_action( 'manage_' . 'df_' . $this->post_type_name . '_posts_custom_column', [ $this, 'setColumnsData' ], 10, 2 );
+            add_filter( 'manage_' . $this->post_type_name . '_posts_columns', [ $this, 'setTableColumns' ] );
+            add_action( 'manage_' . $this->post_type_name . '_posts_custom_column', [ $this, 'setColumnsData' ], 10, 2 );
 
         }
     }
 
-    public function setSubpages()
-    {
-        $this->subpages = [
-            [
-                'parent_slug' => 'develtio_plugin',
-                'page_title' => 'Forms data',
-                'menu_title' => 'Forms data',
-                'capability' => 'manage_options',
-                'menu_slug' => 'develtio_cpt',
-                'callback' => [ $this->callbacks, 'adminCpt' ],
-            ]
-        ];
-    }
-
+    /**
+     * Set columns on forms table list
+     *
+     * @param $columns
+     * @return mixed
+     */
     public function setTableColumns( $columns )
     {
         unset( $columns['date'] );
 
-        foreach ( $this->form_values as $field ) {
+        foreach ( $this->form_components as $component ) {
             $label = '';
-            if ( $field->getLabel() && strlen( $field->getLabel()->getChildren()[0] ) > 0 ) {
-                $label = $field->getLabel()->getChildren()[0];
+
+            if ( $component->getLabel() && strlen( $component->getLabel()->getChildren()[0] ) > 0 ) {
+                $label = $component->getLabel()->getChildren()[0];
             } else {
-                $label = $field->getControl()->placeholder;
+                $label = $component->getControl()->placeholder;
             }
 
-            if ( $label && ( $field->getControl()->type === 'text' || $field->getControl()->type === 'email' ) ) {
-                $columns[$field->getControl()->name] = $label;
+            if ( $label && in_array($component->getOption( 'type' ), $this->displayed_types) ) {
+                $columns[$component->getControl()->name] = $label;
             }
         }
 
@@ -125,15 +109,20 @@ class CustomPostType extends BaseController
         return $columns;
     }
 
+    /**
+     * Set data for columns on form table list
+     *
+     * @param $column
+     * @param $post_id
+     */
     function setColumnsData( $column, $post_id )
     {
 
-        foreach ( $this->form_values as $field ) {
-            if ( $field->getControl()->type === 'text' || $field->getControl()->type === 'email' ) {
-                if ( $column === $field->getControl()->name ) {
-                    echo get_post_meta( $post_id, $field->getControl()->name, true );
+        foreach ( $this->form_components as $component ) {
+            if ( in_array($component->getOption( 'type' ), $this->displayed_types) ) {
+                if ( $column === $component->getControl()->name ) {
+                    echo get_post_meta( $post_id, $component->getControl()->name, true );
                 }
-
             }
         }
     }

@@ -46,7 +46,7 @@ class Dashboard extends BaseController
 
     public function init()
     {
-        $this->settings->addPages( $this->pages )->withSubPage( 'Dashboard' )->init();
+        $this->settings->addPages( $this->pages )->withSubPage( 'Settings' )->init();
     }
 
     public function setSettings()
