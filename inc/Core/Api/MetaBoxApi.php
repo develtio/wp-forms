@@ -40,26 +40,27 @@ class MetaBoxApi
     {
         wp_nonce_field( 'develtio_forms_metaboxes', '_mishanonce' );
 
-        foreach ( $this->form_fields as $field ) {
+        foreach ( $this->form_fields as $key => $field ) {
 
             $label = '';
-            if ( $field->getLabel() && strlen( $field->getLabel()->getChildren()[0] ) > 0 ) {
-                $label = $field->getLabel()->getChildren()[0];
+
+            if ( $field->getLabelPart() && strlen( $field->getLabelPart()->getChildren()[0] ) > 0  ) {
+                $label = $field->getLabelPart()->getChildren()[0];
             } else {
                 $label = $field->getControl()->placeholder;
             }
 
-            if ( $label ) {
+            if ( $field->getOption( 'type' ) !== 'button' ) {
                 array_push( $this->fields,
                     [
                         'label' => $label,
-                        'name' => $field->getControl()->name,
+                        'name' => $key,
                         'type' => $field->getOption( 'type' )
                     ]
                 );
             }
         }
-
+        
         echo '<table class="form-table">
             <tbody>
             ';
@@ -78,6 +79,7 @@ class MetaBoxApi
     {
 
         switch ( $field['type'] ) {
+            case 'hidden':
             case 'text':
                 return '<input type="text" disabled id="' . $field['name'] . '" name="' . $field['name'] . '" value="' . esc_attr( get_post_meta( $post_id, $field['name'], true ) ) . '" class="regular-text" >';
 
@@ -86,16 +88,34 @@ class MetaBoxApi
 
             case 'file':
                 $img = get_post_meta( $post_id, $field['name'], true );
+                if ( $img ) {
+                    $image = ( $img['type'] === 'image/png' ) ? '<img src="' . $img['url'] . '" style="max-width: 150px;">' : "";
+                    $template =
+                        '<p>' . wp_basename( $img['file'] ) . '</p>' .
+                        $image . ' <a href="' . $img['url'] . '" download>Download file</a>';
 
-                $image = ( $img['type'] === 'image/png' ) ? '<img src="' . $img['url'] . '" style="max-width: 150px;">' : "";
-                $template =
-                    '<p>' . wp_basename( $img['file'] ) . '</p>' .
-                    $image . ' <a href="' . $img['url'] . '" download>Download file</a>';
-
-                return $template;
+                    return $template;
+                } else {
+                    return __( 'No file attached', 'develtio_forms' );
+                }
 
             case 'checkbox':
-                return '<input type="checkbox" disabled id="' . $field['name'] . '" name="' . $field['name'] . '" value="' . esc_attr( get_post_meta( $post_id, $field['name'], true ) ) . '" >';
+
+                $values = get_post_meta( $post_id, $field['name'], true );
+
+                $template = '';
+                if ( is_array( $values ) ) {
+                    $template .= '<ul>';
+                    foreach ( $values as $value ) {
+                        $template .= '<li>' . $value . '</li>';
+                    }
+                    $template .= '</ul>';
+                } else {
+                    $template = $values;
+                }
+
+
+                return $template;
 
             case 'radio':
                 return '<input type="radio" disabled id="' . $field['name'] . '" name="' . $field['name'] . '" value="' . esc_attr( get_post_meta( $post_id, $field['name'], true ) ) . '" >';

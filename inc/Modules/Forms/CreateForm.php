@@ -49,7 +49,7 @@ class CreateForm extends BaseController
 
         $this->template = $template;
         $this->setShortcode();
-        $this->custom_post_types->storeCustomPostTypes($this);
+        $this->custom_post_types->storeCustomPostTypes( $this );
 
         if ( isset( $_POST ) && !is_admin() && $this->form->isSubmitted() && $this->form->isSuccess() ) {
             $this->form_values = $this->form->getValues();
@@ -66,7 +66,7 @@ class CreateForm extends BaseController
      */
     public function setShortcode()
     {
-        add_shortcode( $this->form_slug, function ( ) {
+        add_shortcode( $this->form_slug, function () {
             ob_start();
 
             echo ( $this->template ) ? $this->template : $this->form;
@@ -81,7 +81,7 @@ class CreateForm extends BaseController
     public function saveFormData()
     {
 
-        $post_title =  $this->form_name . ' ' . date( "Y-m-d h:i:sa", time() );
+        $post_title = $this->form_name . ' ' . date( "Y-m-d h:i:sa", time() );
         $post_type_name = str_replace( '-', '_', $this->form_slug );
 
         $post_arr = array(
@@ -94,8 +94,9 @@ class CreateForm extends BaseController
 
         foreach ( $this->form_values as $key => $value ) {
 
-            if ( !is_object( $value ) ) {
-                update_post_meta( $post_id, $key, sanitize_text_field( $value ) );
+            if ( is_array( $value ) ) {
+                update_post_meta( $post_id, $key, $value );
+                continue;
             }
 
             if ( $value instanceof FileUpload ) {
@@ -108,7 +109,11 @@ class CreateForm extends BaseController
                         update_post_meta( $post_id, $key, $upload );
                     }
                 }
+
+                continue;
             }
+
+            update_post_meta( $post_id, $key, sanitize_text_field( $value ) );
         }
     }
 
