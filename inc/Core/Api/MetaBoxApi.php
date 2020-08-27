@@ -23,6 +23,7 @@ class MetaBoxApi
         add_action( 'admin_menu', [ $this, 'registerMetaFields' ] );
         add_action( 'save_post', [ $this, 'saveMeta' ], 10, 2 );
         add_filter( 'manage_sunset-contact_posts_columns', 'sunset_set_contact_columns' );
+        add_action('post_edit_form_tag', [$this, 'update_edit_form']);
     }
 
     public function registerMetaFields()
@@ -42,6 +43,7 @@ class MetaBoxApi
         wp_nonce_field( 'somerandomstr', '_mishanonce' );
 
         foreach ( $this->form_fields as $field ) {
+
             $label = '';
             if ( $field->getLabel() && strlen( $field->getLabel()->getChildren()[0] ) > 0 ) {
                 $label = $field->getLabel()->getChildren()[0];
@@ -54,7 +56,7 @@ class MetaBoxApi
                     [
                         'label' => $label,
                         'name' => $field->getControl()->name,
-                        'type' => $field->getControl()->type
+                        'type' => $field->getOption('type')
                     ]
                 );
             }
@@ -116,14 +118,34 @@ class MetaBoxApi
                 return '<input type="text" disabled id="' . $field['name'] . '" name="' . $field['name'] . '" value="' . esc_attr( get_post_meta( $post_id, $field['name'], true ) ) . '" class="regular-text" >';
 
             case 'email':
-                return '<input type="text" disabled id="' . $field['name'] . '" name="' . $field['name'] . '" value="' . esc_attr( get_post_meta( $post_id, $field['name'], true ) ) . '" class="regular-text" >';
+                return '<input type="email" disabled id="' . $field['name'] . '" name="' . $field['name'] . '" value="' . esc_attr( get_post_meta( $post_id, $field['name'], true ) ) . '" class="regular-text" >';
 
             case 'file':
-                return '<input type="file" disabled id="' . $field['name'] . '" name="' . $field['name'] . '" value="' . esc_attr( get_post_meta( $post_id, $field['name'], true ) ) . '" class="regular-text" >';
+                $img = get_post_meta( $post_id, $field['name'], true );
+
+                $image = ($img['type'] === 'image/png') ? '<img src="' . $img['url'] .'" style="max-width: 150px;">' : "";
+                $template =
+                    '<p>' . wp_basename($img['file']) . '</p>' .
+                    $image . ' <a href="' . $img['url'] . '" download>Download file</a>';
+
+                return $template;
+
+            case 'checkbox':
+                return '<input type="checkbox" disabled id="' . $field['name'] . '" name="' . $field['name'] . '" value="' . esc_attr( get_post_meta( $post_id, $field['name'], true ) ) . '" >';
+
+            case 'radio':
+                return '<input type="radio" disabled id="' . $field['name'] . '" name="' . $field['name'] . '" value="' . esc_attr( get_post_meta( $post_id, $field['name'], true ) ) . '" >';
+
+            case 'textarea':
+                return '<textarea disabled id="' . $field['name'] . '" name="' . $field['name'] . '" class="large-text">' . esc_textarea(get_post_meta( $post_id, $field['name'], true )). '</textarea>';
 
             default:
-                return '<input type="text" disabled id="' . $field['name'] . '" name="' . $field['name'] . '" value="' . esc_attr( get_post_meta( $post_id, $field['name'], true ) ) . '" class="regular-text" >';
+                return 'Undefined type :(';
 
         }
     }
+
+    function update_edit_form() {
+        echo ' enctype="multipart/form-data"';
+    } // end update_edit_form
 }

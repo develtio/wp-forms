@@ -7,6 +7,7 @@ namespace Develtio\Modules\Forms;
 
 use Develtio\Core\Base\BaseController;
 use Nette\Forms\Form;
+use Nette\Http\FileUpload;
 use Swift_Mailer;
 use Swift_Message;
 use Swift_SmtpTransport;
@@ -49,7 +50,7 @@ class CreateForm extends BaseController
 
         if ( isset($_POST) && !is_admin() && $form->isSubmitted() && $form->isSuccess() ) {
             $this->form_values = $form->getValues();
-            $this->sendMailForm();
+//            $this->sendMailForm();
             add_action( 'init', [ $this, 'saveFormData' ] );
 
         }
@@ -88,6 +89,7 @@ class CreateForm extends BaseController
         $post_title = $this->getFormName($this->form_name) . ' ' . date( "Y-m-d h:i:sa", time() );
         $post_type_name = str_replace( '-', '_', sanitize_title_with_dashes( $this->getFormName($this->form_name) ) );
 
+
         $post_arr = array(
             'post_title' => $post_title,
             'post_type' => 'df_' . $post_type_name,
@@ -98,11 +100,23 @@ class CreateForm extends BaseController
         $post_id = wp_insert_post( $post_arr );
 
         foreach ( $this->form_values as $key => $value ) {
+
             if(!is_object($value)) {
                 update_post_meta( $post_id, $key, sanitize_text_field( $value ) );
             }
-        }
 
+            if($value instanceof FileUpload) {
+                if(!empty($_FILES[$key]['name'])) {
+                    $upload = wp_upload_bits($_FILES[$key]['name'], null, file_get_contents($_FILES[$key]['tmp_name']));
+
+                    if(isset($upload['error']) && $upload['error'] != 0) {
+                        wp_die('There was an error uploading your file. The error is: ' . $upload['error']);
+                    } else {
+                        update_post_meta($post_id, $key, $upload);
+                    }
+                }
+            }
+        }
 
     }
 
