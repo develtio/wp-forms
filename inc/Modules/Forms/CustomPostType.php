@@ -19,7 +19,10 @@ class CustomPostType extends BaseController
 
     public $form_components;
 
-    protected $post_type_prefix = 'df_';
+    /**
+     * @var CreateForm $form_instance
+     */
+    public $form_instance;
 
     protected $displayed_types = ['text', 'email'];
 
@@ -37,7 +40,8 @@ class CustomPostType extends BaseController
      */
     public function storeCustomPostTypes( CreateForm $instance  )
     {
-        $this->post_type_name = $this->post_type_prefix . str_replace( '-', '_', $instance->form_slug );
+        $this->form_instance = $instance;
+        $this->post_type_name = $instance->post_type_prefix . $instance->form_slug;
         $this->form_components = $instance->form->getComponents();
 
         if ( strlen( $this->post_type_name ) > 20 ) {
@@ -90,15 +94,10 @@ class CustomPostType extends BaseController
     public function setTableColumns( $columns )
     {
         unset( $columns['date'] );
+        unset( $columns['title'] );
 
         foreach ( $this->form_components as $component ) {
-            $label = '';
-
-            if ( $component->getLabel() && strlen( $component->getLabel()->getChildren()[0] ) > 0 ) {
-                $label = $component->getLabel()->getChildren()[0];
-            } else {
-                $label = $component->getControl()->placeholder;
-            }
+            $label = $this->form_instance->getFormLabel($component);
 
             if ( $label && in_array($component->getOption( 'type' ), $this->displayed_types) ) {
                 $columns[$component->getControl()->name] = $label;

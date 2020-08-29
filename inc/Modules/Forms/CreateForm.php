@@ -6,8 +6,11 @@
 namespace Develtio\Modules\Forms;
 
 use Develtio\Core\Base\BaseController;
+use Nette\Forms\Controls\SubmitButton;
 use Nette\Forms\Form;
 use Nette\Http\FileUpload;
+use Nette\Forms\Controls\UploadControl;
+use Swift_Attachment;
 use Swift_Mailer;
 use Swift_Message;
 use Swift_SmtpTransport;
@@ -27,6 +30,8 @@ class CreateForm extends BaseController
     public $template;
 
     public $custom_post_types;
+
+    public $post_type_prefix = 'df-';
 
     public $options = [
         'send_mail' => true
@@ -103,11 +108,10 @@ class CreateForm extends BaseController
     {
 
         $post_title = $this->form_name . ' ' . date( "Y-m-d h:i:sa", time() );
-        $post_type_name = str_replace( '-', '_', $this->form_slug );
 
         $post_arr = array(
             'post_title' => $post_title,
-            'post_type' => 'df_' . $post_type_name,
+            'post_type' => $this->post_type_prefix . $this->form_slug,
             'post_status' => 'publish',
         );
 
@@ -153,19 +157,51 @@ class CreateForm extends BaseController
         $mailer = new Swift_Mailer( $transport );
 
         $content = '';
-        foreach ( $this->form_values as $key => $value ) {
+        $attachment = false;
 
-            if ( !is_object( $value ) ) {
-                $content .= ucfirst( $key ) . ': ' . $value . '<br />';
+        foreach ($this->form->getComponents() as $component) {
+
+            if( $component instanceof SubmitButton) {
+                continue;
             }
+
+            if ( $component instanceof UploadControl ) {
+                $file = $component->value;
+                $attachment = Swift_Attachment::fromPath($file->getTemporaryFile())->setFilename($file->getName());
+
+                continue;
+            }
+
+            $content .= $this->getFormLabel($component) . ': ' . $component->value . '<br />';
         }
 
         $message = ( new Swift_Message( $mail_title ) )
             ->setFrom( [ 'greengo88@gmail.com' => 'Formularz develtio' ] )
             ->setTo( [ 'michal.malinowski@greenparrot.pl' ] )
             ->setBody( $content, 'text/html' );
-        $result = $mailer->send( $message );
 
-        return $result;
+        if($attachment) {
+            $message->attach( $attachment );
+        }
+
+        return $mailer->send( $message );
+    }
+
+    /**
+     * Return form field label
+     *
+     * @param $field
+     * @return mixed
+     */
+    public function getFormLabel($field) {
+        $label = '';
+
+        if ( $field->getLabelPart() && strlen( $field->getLabelPart()->getChildren()[0] ) > 0 ) {
+            $label = $field->getLabelPart()->getChildren()[0];
+        } else {
+            $label = $field->getControl()->placeholder;
+        }
+
+        return $label;
     }
 }
