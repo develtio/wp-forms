@@ -10,20 +10,28 @@ class MetaBoxApi
 
     private $meta_box_data;
 
-    private $form_fields;
+    private $form_components;
 
-    private $fields = [];
+    private $parsed_fields = [];
 
-    public function init( $meta_box_array, $form_fields )
+    /**
+     * Initialize metabox
+     *
+     * @param $meta_box_array
+     * @param $form_components
+     */
+    public function init( $meta_box_array, $form_components )
     {
         $this->meta_box_data = $meta_box_array;
-        $this->form_fields = $form_fields;
-
+        $this->form_components = $form_components;
 
         add_action( 'admin_menu', [ $this, 'addMetaBox' ] );
         add_action( 'post_edit_form_tag', [ $this, 'update_edit_form' ] );
     }
 
+    /**
+     * Add metabox
+     */
     public function addMetaBox()
     {
         add_meta_box(
@@ -36,22 +44,27 @@ class MetaBoxApi
         );
     }
 
+    /**
+     * Callback for metabox. This function display form data inside metabox
+     *
+     * @param $post
+     */
     public function callback( $post )
     {
         wp_nonce_field( 'develtio_forms_metaboxes', '_mishanonce' );
 
-        foreach ( $this->form_fields as $key => $field ) {
+        foreach ( $this->form_components as $key => $field ) {
 
             $label = '';
 
-            if ( $field->getLabelPart() && strlen( $field->getLabelPart()->getChildren()[0] ) > 0  ) {
+            if ( $field->getLabelPart() && strlen( $field->getLabelPart()->getChildren()[0] ) > 0 ) {
                 $label = $field->getLabelPart()->getChildren()[0];
             } else {
                 $label = $field->getControl()->placeholder;
             }
 
             if ( $field->getOption( 'type' ) !== 'button' ) {
-                array_push( $this->fields,
+                array_push( $this->parsed_fields,
                     [
                         'label' => $label,
                         'name' => $key,
@@ -60,32 +73,38 @@ class MetaBoxApi
                 );
             }
         }
-        
+
         echo '<table class="form-table">
             <tbody>
             ';
-        foreach ( $this->fields as $field ):
-            echo '<tr >
-                        <th ><label for="seo_title" > ' . $field['label'] . ' </label ></th >
-                        <td >' . $this->getInputByType( $field, $post->ID ) . '</td >
-                    </tr >';
+        foreach ( $this->parsed_fields as $field ):
+            echo '<tr >' . $this->getRowByType( $field, $post->ID ) . '</tr>';
         endforeach;
         echo '
             </tbody>
         </table>';
     }
 
-    public function getInputByType( $field, $post_id )
+    /**
+     * Displaying form data row on admin post page
+     *
+     * @param array $field Form field
+     * @param int $post_id Post id
+     * @return string Row data
+     */
+    protected function getRowByType( $field, $post_id )
     {
+        $row = '<td style="min-width: 170px;">_title</td><td>_value</td>';
+
+        $title = $field['label'];
 
         switch ( $field['type'] ) {
             case 'hidden':
             case 'text':
-                return '<input type="text" disabled id="' . $field['name'] . '" name="' . $field['name'] . '" value="' . esc_attr( get_post_meta( $post_id, $field['name'], true ) ) . '" class="regular-text" >';
-
             case 'email':
-                return '<input type="email" disabled id="' . $field['name'] . '" name="' . $field['name'] . '" value="' . esc_attr( get_post_meta( $post_id, $field['name'], true ) ) . '" class="regular-text" >';
-
+            case 'textarea':
+                $value = '<p>'. esc_html( get_post_meta( $post_id, $field['name'], true ) ) . '</p>';
+                break;
             case 'file':
                 $img = get_post_meta( $post_id, $field['name'], true );
                 if ( $img ) {
@@ -94,15 +113,18 @@ class MetaBoxApi
                         '<p>' . wp_basename( $img['file'] ) . '</p>' .
                         $image . ' <a href="' . $img['url'] . '" download>Download file</a>';
 
-                    return $template;
+                    $value = $template;
                 } else {
-                    return __( 'No file attached', 'develtio_forms' );
+                    $value = __( 'No file attached', 'develtio_forms' );
                 }
+                break;
+            case 'radio':
+                $value = get_post_meta( $post_id, $field['name'], true );
+                break;
 
             case 'checkbox':
 
                 $values = get_post_meta( $post_id, $field['name'], true );
-
                 $template = '';
                 if ( is_array( $values ) ) {
                     $template .= '<ul>';
@@ -111,22 +133,19 @@ class MetaBoxApi
                     }
                     $template .= '</ul>';
                 } else {
-                    $template = $values;
+                    $template = $values ?  '<span style="color:green;">' . $title .'</span>' : '<span style="color:red;">' . $title .'</span>';
+                    $title = '';
                 }
 
-
-                return $template;
-
-            case 'radio':
-                return '<input type="radio" disabled id="' . $field['name'] . '" name="' . $field['name'] . '" value="' . esc_attr( get_post_meta( $post_id, $field['name'], true ) ) . '" >';
-
-            case 'textarea':
-                return '<textarea disabled id="' . $field['name'] . '" name="' . $field['name'] . '" class="large-text">' . esc_textarea( get_post_meta( $post_id, $field['name'], true ) ) . '</textarea>';
-
+                $value = $template;
+                break;
             default:
-                return 'Undefined type :(';
+                $value = 'Undefined type :(';
+                break;
 
         }
+
+        return strtr( $row, [ '_title' => $title, '_value' => $value ] );
     }
 
     /**
