@@ -3,8 +3,8 @@
     "description": "Make forms doable",
     "type": "wordpress-muplugin",
     "require": {
-        "nette/forms": "^3.0",
-        "composer/installers": "~1.0"
+        "composer/installers": "~1.0",
+        "nette/forms": "^3.0"
     },
     "authors": [
         {

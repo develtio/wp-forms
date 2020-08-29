@@ -44,10 +44,8 @@ class CreateForm extends BaseController
 
     }
 
-    public function save( $template = null )
+    public function save()
     {
-
-        $this->template = $template;
         $this->setShortcode();
         $this->custom_post_types->storeCustomPostTypes( $this );
 
@@ -69,10 +67,33 @@ class CreateForm extends BaseController
         add_shortcode( $this->form_slug, function () {
             ob_start();
 
-            echo ( $this->template ) ? $this->template : $this->form;
+            echo ( $this->template ) ? $this->getTemplate($this->form) : $this->form;
 
             return ob_get_clean();
         } );
+    }
+
+    public function getTemplate( $form )
+    {
+        return $this->buildTemplate( $this->template, $form );
+    }
+
+    public function buildTemplate( $template, $form = null )
+    {
+        $form = $form ? $form : $this->form;
+        $vars = [];
+
+        foreach ($this->form->getComponents() as $key => $value) {
+            $vars['{' . $key . '_field}'] = $form[$key]->control;
+            $vars['{' . $key . '_error}'] = $form[$key]->error ? '<p class="error">' . $form[$key]->error . '</p>' : '';
+        }
+
+        return strtr( $template, $vars );
+    }
+
+    public function setTemplate( $template )
+    {
+        $this->template = $template;
     }
 
     /**
