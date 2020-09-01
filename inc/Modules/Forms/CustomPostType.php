@@ -8,15 +8,30 @@ namespace Develtio\Modules\Forms;
 use Develtio\Core\Base\BaseController;
 use Develtio\Core\Api\MetaBoxApi;
 
+/**
+ * Class CustomPostType
+ * @package Develtio\Modules\Forms
+ */
 class CustomPostType extends BaseController
 {
-
+    /**
+     * @var string
+     */
     public $post_type_name;
 
+    /**
+     * @var MetaBoxApi
+     */
     public $meta_box;
 
+    /**
+     * @var array
+     */
     public $custom_post_types = [];
 
+    /**
+     * @var array
+     */
     public $form_components;
 
     /**
@@ -24,8 +39,15 @@ class CustomPostType extends BaseController
      */
     public $form_instance;
 
+    /**
+     * @var array
+     */
     protected $displayed_types = ['text', 'email'];
 
+    /**
+     * Register CPT
+     * @return $this
+     */
     public function registerCustomPostTypes()
     {
 
@@ -33,10 +55,13 @@ class CustomPostType extends BaseController
             register_post_type( $post_type['name'], $post_type['args'] );
         }
 
+        return $this;
     }
 
     /**
-     * @param $instance
+     * Store data for custom post types, metabox, and columns
+     * @param CreateForm $instance
+     * @return $this
      */
     public function storeCustomPostTypes( CreateForm $instance  )
     {
@@ -83,6 +108,8 @@ class CustomPostType extends BaseController
             add_action( 'manage_' . $this->post_type_name . '_posts_custom_column', [ $this, 'setColumnsData' ], 10, 2 );
 
         }
+
+        return $this;
     }
 
     /**
@@ -105,6 +132,7 @@ class CustomPostType extends BaseController
         }
 
         $columns['date'] = __( 'Date' );
+
         return $columns;
     }
 

@@ -6,39 +6,86 @@
 namespace Develtio\Modules\Forms;
 
 use Develtio\Core\Base\BaseController;
-use Nette\Forms\Controls\SubmitButton;
+use Nette\ComponentModel\Component;
 use Nette\Forms\Form;
 use Nette\Http\FileUpload;
-use Nette\Forms\Controls\UploadControl;
-use Swift_Attachment;
-use Swift_Mailer;
-use Swift_Message;
-use Swift_SmtpTransport;
-use Develtio\Modules\Forms\CustomPostType;
 
+/**
+ * Class CreateForm provide for creating and manage forms
+ *
+ * @since 1.0.0
+ * @package Develtio\Modules\Forms
+ */
 class CreateForm extends BaseController
 {
-
+    /**
+     * Nette form instance
+     * @var Form
+     */
     public $form;
 
+    /**
+     * Form name
+     * @var string
+     */
     public $form_name;
 
+    /**
+     * Form slug generate by sanitization
+     * @var string
+     */
     public $form_slug;
 
+    /**
+     * Submitted form values
+     * @var array
+     */
     public $form_values;
 
+    /**
+     * HTML for Form template
+     * @var string
+     */
     public $template;
 
+    /**
+     * HTML for successful form submitting
+     * @var string
+     */
     public $success_template;
 
+    /**
+     * Instance for CPT
+     * @var CustomPostType
+     */
     public $custom_post_types;
 
+    /**
+     * Prefix for created post type
+     * @var string
+     */
     public $post_type_prefix = 'df-';
 
+    /**
+     * Mail instance
+     * @var Mail
+     */
+    public $mail;
+
+    /**
+     * Options form customizing features and properties
+     * @var array
+     */
     public $options = [
-        'send_mail' => true
+        'send_mail' => true,
+        'send_confirm_mail' => false
     ];
 
+    /**
+     * CreateForm constructor.
+     * @param string $form_name
+     * @param array $options
+     */
     public function __construct( $form_name, $options = [] )
     {
         parent::__construct();
@@ -46,12 +93,16 @@ class CreateForm extends BaseController
         $this->success_template = '<p class="form__success">' . __('Thank you for contacting us. We have received your enquiry and will respond to you within 24 hours.') . ' </p>';
         $this->options = array_merge( $this->options, $options );
         $this->form = new Form;
+        $this->mail = new Mail($this);
         $this->form_name = $form_name;
         $this->form_slug = sanitize_title( $form_name );
         $this->custom_post_types = new CustomPostType();
 
     }
 
+    /**
+     * This method is called after the form is created
+     */
     public function save()
     {
         $this->setShortcode();
@@ -60,7 +111,7 @@ class CreateForm extends BaseController
         if ( isset( $_POST ) && !is_admin() && $this->form->isSubmitted() && $this->form->isSuccess() ) {
             $this->form_values = $this->form->getValues();
 
-            if ( $this->options['send_mail'] ) $this->sendMailForm();
+            if ( $this->options['send_mail'] ) $this->mail->send();
 
             add_action( 'init', [ $this, 'saveFormData' ] );
 
@@ -68,7 +119,7 @@ class CreateForm extends BaseController
     }
 
     /**
-     * Create short code based on form name
+     * Create short code based on the form slug
      */
     public function setShortcode()
     {
@@ -81,11 +132,24 @@ class CreateForm extends BaseController
         } );
     }
 
+    /**
+     * Get template with data
+     *
+     * @param Form $form Form instance
+     * @return string Template string
+     */
     public function getTemplate( $form )
     {
         return $this->buildTemplate( $this->template, $form );
     }
 
+    /**
+     * Pass data form form instance to form template
+     *
+     * @param string $template
+     * @param null $form Form instance or null
+     * @return string
+     */
     public function buildTemplate( $template, $form = null )
     {
         $form = $form ? $form : $this->form;
@@ -99,17 +163,25 @@ class CreateForm extends BaseController
         return strtr( $template, $vars );
     }
 
+    /**
+     * Set template
+     * @param $template
+     */
     public function setTemplate( $template )
     {
         $this->template = $template;
     }
 
+    /**
+     * Set success template
+     * @param $template
+     */
     public function setSuccessTemplate($template) {
         $this->success_template = $template;
     }
 
     /**
-     * Save form data to wp meta fields
+     * Create post and save form data to wp meta fields
      */
     public function saveFormData()
     {
@@ -150,69 +222,18 @@ class CreateForm extends BaseController
     }
 
     /**
-     * Send mail
-     *
-     * @return int
-     */
-    private function sendMailForm()
-    {
-        $mail_title = $this->form_name . ' ' . date( "Y-m-d h:i:sa", time() );
-
-        $transport = ( new Swift_SmtpTransport( SMTP_HOST, SMTP_PORT, SMTP_ENCRYPTION ) )
-            ->setUsername( SMTP_USERNAME )
-            ->setPassword( SMTP_PASSWORD );
-        $mailer = new Swift_Mailer( $transport );
-
-        $content = '';
-        $attachment = false;
-
-        foreach ($this->form->getComponents() as $component) {
-
-            if( $component instanceof SubmitButton) {
-                continue;
-            }
-
-            if ( $component instanceof UploadControl ) {
-                $file = $component->value;
-
-                if($file->hasFile()) {
-                    $attachment = Swift_Attachment::fromPath( $file->getTemporaryFile() )->setFilename( $file->getName() );
-                }
-                continue;
-            }
-
-            $content .= $this->getFormLabel($component) . ': ' . $component->value . '<br />';
-        }
-
-        $message = ( new Swift_Message( $mail_title ) )
-            ->setFrom( [ 'greengo88@gmail.com' => 'Formularz develtio' ] )
-            ->setTo( [ 'michal.malinowski@greenparrot.pl' ] )
-            ->setBody( $content, 'text/html' );
-
-        if($attachment) {
-            $message->attach( $attachment );
-        }
-
-        $this->template = $this->success_template;
-
-        return $mailer->send( $message );
-    }
-
-    /**
      * Return form field label
      *
-     * @param $field
+     * @param Component $field Nette form component
      * @return mixed
      */
     public function getFormLabel($field) {
-        $label = '';
 
         if ( $field->getLabelPart() && strlen( $field->getLabelPart()->getChildren()[0] ) > 0 ) {
-            $label = $field->getLabelPart()->getChildren()[0];
+            return $field->getLabelPart()->getChildren()[0];
         } else {
-            $label = $field->getControl()->placeholder;
+            return $field->getControl()->placeholder;
         }
 
-        return $label;
     }
 }
