@@ -63,7 +63,7 @@ class View extends BaseController {
         if ( is_array( $params ) && ! empty( $params ) ) {
 
             foreach ( $params as $key => $value ) {
-                $this->vars[ $key ] = $value;
+                $this->vars[ '{' . $key . '}' ] = $value;
             }
         }
 
@@ -71,7 +71,11 @@ class View extends BaseController {
 
             ob_start();
 
-            include $template;
+            if(@file_exists($template)){
+                $template = file_get_contents($template);
+            }
+
+            echo strtr( $template, $this->vars );
 
             $output = ob_get_clean();
 

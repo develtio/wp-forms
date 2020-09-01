@@ -205,8 +205,9 @@
                     <div id="content">
                         <table>
                             <tr>
-                                <td style="background: #17ff81; color:#000; padding: 10px 0; text-align: center">
-                                    {title}
+                                <td style="text-align: center">
+                                    <h1 align="center" style="text-align: center; margin: 0;">{title}</h1>
+                                    <br />
                                 </td>
                             </tr>
                             <tr>
@@ -227,28 +228,6 @@
 
         </table>
         <!-- /body -->
-
-        <!-- footer -->
-        <table id="footer-wrap">
-            <tr>
-                <td></td>
-                <td id="container">
-                    <div id="content">
-                        <table>
-                            <tr>
-                                <td align="center">
-                                    <p>{footer}</p>
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-
-                </td>
-                <td></td>
-            </tr>
-
-        </table>
-        <!-- /footer -->
 
     </body>
 </html>

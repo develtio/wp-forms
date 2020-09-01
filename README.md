@@ -69,6 +69,14 @@ Po wysłaniu formularza wyświetla się domyślnie informacja z podziękowaniem.
     $instance->setSuccessTemplate('<p>Thank you for contacting us</p>');
 ```
 
+#### Confirm template ####
+Zmienić template maila potwierdzającego można poprzez metodę `$mail->setConfirmTemplate()`, której argumentem może być pełny kod HTML templatu, albo ścieżka do pliuku zawierającego takowy HTML 
+Można również jedynie zmienić nagłównek oraz treść w już istniejącym temlpate poprzez metody `$mail->setConfirmTemplateContent( $content )` oraz `$mail->setConfirmTemplateTitle( $title )`
+
+#### Mail template ####
+Tempalte maila z danymi można zmienić poprzez metodę `$mail->setMailTemplate( $tpl )` gdzie `$tpl` może być ścieżką do pliku z templatem lub stringiem. 
+W miejscu, w którym powinny wyświetlić się dane, należy umieścić znacznik `{content}`;
+
 ## Wyświetlanie ##
 Formularz można wyświetlić na 2 sposoby, albo spreparować własną funkcję bazującą na instancji `$instance->form` i wyświetlić ją w odpowiedni miejcu na stronie,
 albo użyć shortcode, który generuje się automatycznie na bazie nazwy formularza. Formularz nazwany `Sample form` stworzy shortcode `[sample-form]`
