@@ -8,6 +8,10 @@ namespace Develtio\Modules\Forms;
 
 use Develtio\Core\Base\BaseController;
 
+/**
+ * Class Init
+ * @package Develtio\Modules\Forms
+ */
 class Init extends BaseController {
 
     public function init()
@@ -26,7 +30,7 @@ class Init extends BaseController {
     public static function get_services()
     {
         return [
-//            CustomPostType::class,
+            Enqueue::class
         ];
     }
 

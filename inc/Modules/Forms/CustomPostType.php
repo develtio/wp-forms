@@ -8,21 +8,46 @@ namespace Develtio\Modules\Forms;
 use Develtio\Core\Base\BaseController;
 use Develtio\Core\Api\MetaBoxApi;
 
+/**
+ * Class CustomPostType
+ * @package Develtio\Modules\Forms
+ */
 class CustomPostType extends BaseController
 {
-
+    /**
+     * @var string
+     */
     public $post_type_name;
 
+    /**
+     * @var MetaBoxApi
+     */
     public $meta_box;
 
+    /**
+     * @var array
+     */
     public $custom_post_types = [];
 
+    /**
+     * @var array
+     */
     public $form_components;
 
-    protected $post_type_prefix = 'df_';
+    /**
+     * @var CreateForm $form_instance
+     */
+    public $form_instance;
 
+    /**
+     * @var array
+     */
     protected $displayed_types = ['text', 'email'];
 
+    /**
+     * Register CPT
+     * @return $this
+     */
     public function registerCustomPostTypes()
     {
 
@@ -30,14 +55,18 @@ class CustomPostType extends BaseController
             register_post_type( $post_type['name'], $post_type['args'] );
         }
 
+        return $this;
     }
 
     /**
-     * @param $instance
+     * Store data for custom post types, metabox, and columns
+     * @param CreateForm $instance
+     * @return $this
      */
     public function storeCustomPostTypes( CreateForm $instance  )
     {
-        $this->post_type_name = $this->post_type_prefix . str_replace( '-', '_', $instance->form_slug );
+        $this->form_instance = $instance;
+        $this->post_type_name = $instance->post_type_prefix . $instance->form_slug;
         $this->form_components = $instance->form->getComponents();
 
         if ( strlen( $this->post_type_name ) > 20 ) {
@@ -79,6 +108,8 @@ class CustomPostType extends BaseController
             add_action( 'manage_' . $this->post_type_name . '_posts_custom_column', [ $this, 'setColumnsData' ], 10, 2 );
 
         }
+
+        return $this;
     }
 
     /**
@@ -90,15 +121,10 @@ class CustomPostType extends BaseController
     public function setTableColumns( $columns )
     {
         unset( $columns['date'] );
+        unset( $columns['title'] );
 
         foreach ( $this->form_components as $component ) {
-            $label = '';
-
-            if ( $component->getLabel() && strlen( $component->getLabel()->getChildren()[0] ) > 0 ) {
-                $label = $component->getLabel()->getChildren()[0];
-            } else {
-                $label = $component->getControl()->placeholder;
-            }
+            $label = $this->form_instance->getFormLabel($component);
 
             if ( $label && in_array($component->getOption( 'type' ), $this->displayed_types) ) {
                 $columns[$component->getControl()->name] = $label;
@@ -106,6 +132,7 @@ class CustomPostType extends BaseController
         }
 
         $columns['date'] = __( 'Date' );
+
         return $columns;
     }
 
