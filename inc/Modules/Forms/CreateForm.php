@@ -29,6 +29,8 @@ class CreateForm extends BaseController
 
     public $template;
 
+    public $success_template;
+
     public $custom_post_types;
 
     public $post_type_prefix = 'df-';
@@ -41,6 +43,7 @@ class CreateForm extends BaseController
     {
         parent::__construct();
 
+        $this->success_template = '<p class="form__success">' . __('Thank you for contacting us. We have received your enquiry and will respond to you within 24 hours.') . ' </p>';
         $this->options = array_merge( $this->options, $options );
         $this->form = new Form;
         $this->form_name = $form_name;
@@ -99,6 +102,10 @@ class CreateForm extends BaseController
     public function setTemplate( $template )
     {
         $this->template = $template;
+    }
+
+    public function setSuccessTemplate($template) {
+        $this->success_template = $template;
     }
 
     /**
@@ -167,8 +174,10 @@ class CreateForm extends BaseController
 
             if ( $component instanceof UploadControl ) {
                 $file = $component->value;
-                $attachment = Swift_Attachment::fromPath($file->getTemporaryFile())->setFilename($file->getName());
 
+                if($file->hasFile()) {
+                    $attachment = Swift_Attachment::fromPath( $file->getTemporaryFile() )->setFilename( $file->getName() );
+                }
                 continue;
             }
 
@@ -183,6 +192,8 @@ class CreateForm extends BaseController
         if($attachment) {
             $message->attach( $attachment );
         }
+
+        $this->template = $this->success_template;
 
         return $mailer->send( $message );
     }

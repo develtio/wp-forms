@@ -6,3 +6,5 @@
 
 # Ignore vendor lib
 vendor
+node_modules
+dist
