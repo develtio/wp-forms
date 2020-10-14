@@ -26,7 +26,7 @@ class AdminCallbacks extends BaseController
 
     public function develtioAdminSection()
     {
-        echo 'Activate features';
+        echo __('Activate features', 'develtio-forms');
     }
 
     public function develtioTextExample( $args )

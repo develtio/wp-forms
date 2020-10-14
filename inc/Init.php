@@ -14,6 +14,7 @@ final class Init
     public static function get_services()
     {
         return [
+            Core\Base\Translations::class,
             Core\Pages\Dashboard::class,
             Core\Base\Enqueue::class,
             Core\Base\SettingsLinks::class,
@@ -45,5 +46,13 @@ final class Init
     private static function instantiate( $class )
     {
         return new $class();
+    }
+
+    /**
+     * Load translations
+     */
+    public function load_my_transl()
+    {
+        load_plugin_textdomain('develtio-forms', FALSE, dirname(plugin_basename(__FILE__)).'/lang/');
     }
 }

@@ -11,6 +11,7 @@
  * License:     GPLv2 or later
  * License URI: http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  * Text Domain: develtio-forms
+ * Domain Path: /lang
  */
 
 // Abort if this file is called directly

@@ -46,7 +46,7 @@ class Dashboard extends BaseController
 
     public function init()
     {
-        $this->settings->addPages( $this->pages )->withSubPage( 'Settings' )->init();
+        $this->settings->addPages( $this->pages )->withSubPage( __('Settings', 'develtio-forms') )->init();
     }
 
     public function setSettings()
@@ -68,7 +68,7 @@ class Dashboard extends BaseController
         $args = [
             [
                 'id' => 'develtio_dashboard_index',
-                'title' => 'Settings',
+                'title' => __('Settings', 'develtio-forms'),
                 'callback' => [ $this->callbacks, 'develtioAdminSection' ],
                 'page' => 'develtio_plugin'
             ]
