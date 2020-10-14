@@ -3,44 +3,45 @@
 </p>
 
 # Develtio Forms #
-Plugin pozwalający na tworzenie i zarządzanie formularzami. Każdy stworzony formularz generuje nowy post type
-oraz zapisuje wszystkie wysłane dane jako oddzielne pola do wglądu w administracji WP.
+Plugin that allows you to create and manage forms. Each created form generates a new post type
+and saves all sent data as separate fields in WP administration.
 
-## Użycie ##
-Do budowania formularzy jest użyty Nette Forms https://doc.nette.org/en/3.0/forms
+## Use ##
+We use the Nette From library to building the forms (https://doc.nette.org/en/3.0/forms)
 
-Przykład
+Example
 ```php
 if ( class_exists( '\Develtio\Modules\Forms\CreateForm' ) ) {
     $options = [ 
-        'send_mail' => true, // włącza/wyłącza wysłanie maila, domyślnie włączone
-        'send_confirm_mail' => true // włącza/wyłącza wysłanie potwierdzenia, domyślnie wyłączone
+        'send_mail' => true, // enables / disables sending an email, enabled by default
+        'send_confirm_mail' => true // enables / disables sending of confirmation email, disabled by default
     ];
 
     $instance = new \Develtio\Modules\Forms\CreateForm('Sample Form', $options);
     
-    $mail = $instance->mail; // pobranie instancji wysyłki maila
+    $mail = $instance->mail;
     $mail->setFrom(['noreply@example.com' => 'Sample form']);
     $mail->setTo(['info@example.com']);
     $mail->setTitle('Mail title');
-    $mail->setConfirmMailField('contact_email'); // opcjonalne, jeśli wysyłamy mail z potwierdzeniem należy podać nazwe pola, z którego ma być pobrany adres e-mail
+    $mail->setConfirmMailField('contact_email'); // optional, if we send a confirmation e-mail, enter the name of the field from which the e-mail address is to be retrieved
 
 
-    $form = $instance->form; // pobranie instancji NetteForms
+    $form = $instance->form; // Nette Forms Instance
     $form->addText('contact_name')->setHtmlAttribute('placeholder', __('Name', 'develtio'));
     $form->addEmail( 'contact_email' )->setHtmlAttribute( 'placeholder', __( 'E-mail' ) )->setRequired( true );    
 
-    $instance->save(); // Generuje formularz oraz post type na jego bazie
+    $instance->save(); // Generate a form and post type
 }
 ```
 
-## Szablony ##
+## Templates ##
 
 ##### Form template #####
-Domyślnie zostaną wyświetlone pola pod sobą, Nette Forms udostępnia modyfikacje tego wyświetlania zaprezentowaną tutaj https://doc.nette.org/en/3.0/form-rendering
-Alternatywnie, można użyć manualnego ustawienia wyglądy formularza za pomocą `$instance->setTemplate($template);` i używania specjalnie nazwanych stringów `field-name_field` oraz `field-name_error` 
-w przypoadku jeśli chce się używać formularzy jako shortcode:
+By default, the fields will be displayed below each other, Nette Forms provides a modification of this display presented here https://doc.nette.org/en/3.0/form-rendering
+Alternatively, you can manually set the display of the form with `$instance->setTemplate($template);` and special fields names `field-name_field` and `field-name_error` 
+if you want to use forms as a shortcode.
 
+##### Example #####
 ```html
 <form method="post" action="/" class="form--default" enctype="multipart/form-data">
     <div class="row">
@@ -61,22 +62,28 @@ w przypoadku jeśli chce się używać formularzy jako shortcode:
 </div>
 ```
 
-Jesli shortcode nie będzie używany, stworzyć szablon używając, odwołań `$form['field-name']->control` oraz `$form['field-name']->error` zamiast wyżej podanych stringów
+If the shortcode is not going to be used, you can create a template using, references `$form['field-name']->control` and `$form['field-name']->error` instead `field-name_field` and `field-name_error` 
 
 #### Success template ####
-Po wysłaniu formularza wyświetla się domyślnie informacja z podziękowaniem. Można ją zmienić za pomocą metody:
+You can Customize thank you message in this way:
 ```php
     $instance->setSuccessTemplate('<p>Thank you for contacting us</p>');
 ```
 
 #### Confirm template ####
-Zmienić template maila potwierdzającego można poprzez metodę `$mail->setConfirmTemplate()`, której argumentem może być pełny kod HTML templatu, albo ścieżka do pliuku zawierającego takowy HTML 
-Można również jedynie zmienić nagłównek oraz treść w już istniejącym temlpate poprzez metody `$mail->setConfirmTemplateContent( $content )` oraz `$mail->setConfirmTemplateTitle( $title )`
+| Method        | Params           | Description  |
+| ------------- |:-------------:| -----:|
+| `$mail->setConfirmTemplate( $tempalte )` | html or path to file | full mail confirm template |
+| `$mail->setConfirmTemplateContent( $content )`      | html or string      |   mail content |
+| `$mail->setConfirmTemplateTitle( $title )` | html or string      |    mail title|
 
 #### Mail template ####
-Tempalte maila z danymi można zmienić poprzez metodę `$mail->setMailTemplate( $tpl )` gdzie `$tpl` może być ścieżką do pliku z templatem lub stringiem. 
-W miejscu, w którym powinny wyświetlić się dane, należy umieścić znacznik `{content}`;
+| Method        | Params           | Description  |
+| ------------- |:-------------:| -----:|
+| `$mail->setMailTemplate( $tempalte )` | html or path to file | full mail template |
 
-## Wyświetlanie ##
-Formularz można wyświetlić na 2 sposoby, albo spreparować własną funkcję bazującą na instancji `$instance->form` i wyświetlić ją w odpowiedni miejcu na stronie,
-albo użyć shortcode, który generuje się automatycznie na bazie nazwy formularza. Formularz nazwany `Sample form` stworzy shortcode `[sample-form]`
+In the place where the data should be displayed, place the `{content}` string.
+
+## Display ##
+The form can be displayed in two ways. You can create your own function based on the instance `$instance->form` and display it in the appropriate place on the page,
+or You can use a shortcode that is generated automatically from the form name e.g. `Sample form` creates `[sample-form]` shortcode.
