@@ -3,14 +3,14 @@
  * @package Dforms
  */
 
-namespace Develtio\Modules\Forms;
+namespace Develtio\WP\Forms\Modules\Forms;
 
-use Develtio\Core\Base\BaseController;
-use Develtio\Core\Api\MetaBoxApi;
+use Develtio\WP\Forms\Core\Base\BaseController;
+use Develtio\WP\Forms\Core\Api\MetaBoxApi;
 
 /**
  * Class CustomPostType
- * @package Develtio\Modules\Forms
+ * @package Develtio\WP\Forms\Modules\Forms
  */
 class CustomPostType extends BaseController
 {

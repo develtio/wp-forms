@@ -11,13 +11,13 @@ We use the Nette From library to building the forms (https://doc.nette.org/en/3.
 
 Example
 ```php
-if ( class_exists( '\Develtio\Modules\Forms\CreateForm' ) ) {
+if ( class_exists( '\Develtio\WP\Forms\Modules\Forms\CreateForm' ) ) {
     $options = [ 
         'send_mail' => true, // enables / disables sending an email, enabled by default
         'send_confirm_mail' => true // enables / disables sending of confirmation email, disabled by default
     ];
 
-    $instance = new \Develtio\Modules\Forms\CreateForm('Sample Form', $options);
+    $instance = new \Develtio\WP\Forms\Modules\Forms\CreateForm('Sample Form', $options);
     
     $mail = $instance->mail;
     $mail->setFrom(['noreply@example.com' => 'Sample form']);

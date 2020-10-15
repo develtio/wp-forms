@@ -2,10 +2,10 @@
 /**
 * @package  DeveltioForms
 */
-namespace Develtio\Modules\Forms;
+namespace Develtio\WP\Forms\Modules\Forms;
 
-use Develtio\Core\Base\BaseController;
-use Develtio\Core\Base\View;
+use Develtio\WP\Forms\Core\Base\BaseController;
+use Develtio\WP\Forms\Core\Base\View;
 use Nette\Forms\Controls\SubmitButton;
 use Nette\Forms\Controls\UploadControl;
 use ParagonIE\Sodium\Core\Curve25519\Ge\P1p1;

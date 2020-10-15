@@ -3,9 +3,9 @@
  * @package Dforms
  */
 
-namespace Develtio\Modules\Forms;
+namespace Develtio\WP\Forms\Modules\Forms;
 
-use Develtio\Core\Base\BaseController;
+use Develtio\WP\Forms\Core\Base\BaseController;
 use Nette\ComponentModel\Component;
 use Nette\Forms\Form;
 use Nette\Http\FileUpload;
@@ -14,7 +14,7 @@ use Nette\Http\FileUpload;
  * Class CreateForm provide for creating and manage forms
  *
  * @since 1.0.0
- * @package Develtio\Modules\Forms
+ * @package Develtio\WP\Forms\Modules\Forms
  */
 class CreateForm extends BaseController
 {

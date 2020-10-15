@@ -3,7 +3,7 @@
  * @package Dforms
  */
 
-namespace Develtio;
+namespace Develtio\WP\Forms;
 
 final class Init
 {

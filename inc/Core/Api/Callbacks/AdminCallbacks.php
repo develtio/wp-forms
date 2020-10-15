@@ -3,9 +3,9 @@
  * @package Dforms
  */
 
-namespace Develtio\Core\Api\Callbacks;
+namespace Develtio\WP\Forms\Core\Api\Callbacks;
 
-use Develtio\Core\Base\BaseController;
+use Develtio\WP\Forms\Core\Base\BaseController;
 
 class AdminCallbacks extends BaseController
 {

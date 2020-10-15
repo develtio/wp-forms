@@ -3,13 +3,13 @@
  * @package  DeveltioForms
  */
 
-namespace Develtio\Modules\Forms;
+namespace Develtio\WP\Forms\Modules\Forms;
 
-use Develtio\Core\Base\BaseController;
+use Develtio\WP\Forms\Core\Base\BaseController;
 
 /**
  * Class Enqueue
- * @package Develtio\Modules\Forms
+ * @package Develtio\WP\Forms\Modules\Forms
  */
 class Enqueue extends BaseController
 {

@@ -4,13 +4,13 @@
  * Options name: develtio_forms
  */
 
-namespace Develtio\Modules\Forms;
+namespace Develtio\WP\Forms\Modules\Forms;
 
-use Develtio\Core\Base\BaseController;
+use Develtio\WP\Forms\Core\Base\BaseController;
 
 /**
  * Class Init
- * @package Develtio\Modules\Forms
+ * @package Develtio\WP\Forms\Modules\Forms
  */
 class Init extends BaseController {
 

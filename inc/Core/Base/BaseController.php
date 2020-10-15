@@ -3,7 +3,7 @@
  * @package Dforms
  */
 
-namespace Develtio\Core\Base;
+namespace Develtio\WP\Forms\Core\Base;
 
 class BaseController
 {

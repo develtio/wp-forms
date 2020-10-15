@@ -2,7 +2,7 @@
 /**
  * @package DForms
  */
-namespace Develtio\Core\Base;
+namespace Develtio\WP\Forms\Core\Base;
 
 class Deactivate {
     public static  function deactivate() {

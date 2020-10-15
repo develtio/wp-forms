@@ -3,11 +3,11 @@
  * @package Dforms
  */
 
-namespace Develtio\Core\Pages;
+namespace Develtio\WP\Forms\Core\Pages;
 
-use Develtio\Core\Api\SettingsApi;
-use Develtio\Core\Base\BaseController;
-use Develtio\Core\Api\Callbacks\AdminCallbacks;
+use Develtio\WP\Forms\Core\Api\SettingsApi;
+use Develtio\WP\Forms\Core\Base\BaseController;
+use Develtio\WP\Forms\Core\Api\Callbacks\AdminCallbacks;
 
 class Dashboard extends BaseController
 {

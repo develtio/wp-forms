@@ -27,7 +27,7 @@ if ( is_readable( __DIR__ . '/vendor/autoload.php' ) ) {
  */
 function activate_develtio_plugin()
 {
-    \Develtio\Core\Base\Activate::activate();
+    \Develtio\WP\Forms\Core\Base\Activate::activate();
 }
 
 register_activation_hook( __FILE__, 'activate_develtio_plugin' );
@@ -37,13 +37,13 @@ register_activation_hook( __FILE__, 'activate_develtio_plugin' );
  */
 function deactivate_develtio_plugin()
 {
-    \Develtio\Core\Base\Deactivate::deactivate();
+    \Develtio\WP\Forms\Core\Base\Deactivate::deactivate();
 }
 register_deactivation_hook( __FILE__, 'deactivate_develtio_plugin' );
 
 /**
  *  Init all core classes
  */
-if ( class_exists( 'Develtio\\Init' ) ) {
-    Develtio\Init::register_services();
+if ( class_exists( 'Develtio\\WP\\Forms\\Init' ) ) {
+    \Develtio\WP\Forms\Init::register_services();
 }

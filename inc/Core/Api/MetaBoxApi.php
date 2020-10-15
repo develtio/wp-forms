@@ -3,7 +3,7 @@
  * @package Dforms
  */
 
-namespace Develtio\Core\Api;
+namespace Develtio\WP\Forms\Core\Api;
 
 class MetaBoxApi
 {

@@ -3,13 +3,13 @@
  * @package Dforms
  */
 
-namespace Develtio\Core\Base;
+namespace Develtio\WP\Forms\Core\Base;
 
-use Develtio\Core\Base\BaseController;
+use Develtio\WP\Forms\Core\Base\BaseController;
 
 /**
  * Class View
- * @package Develtio\Core\Base
+ * @package Develtio\WP\Forms\Core\Base
  */
 class View extends BaseController {
 
