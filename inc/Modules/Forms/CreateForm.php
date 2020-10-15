@@ -111,7 +111,7 @@ class CreateForm extends BaseController
         if ( isset( $_POST ) && !is_admin() && $this->form->isSubmitted() && $this->form->isSuccess() ) {
             $this->form_values = $this->form->getValues();
 
-            if ( $this->options['send_mail'] ) $this->mail->send();
+            if ( $this->options['send_mail'] ) $this->mail->proceed();
 
             add_action( 'init', [ $this, 'saveFormData' ] );
 

@@ -8,6 +8,7 @@ use Develtio\Core\Base\BaseController;
 use Develtio\Core\Base\View;
 use Nette\Forms\Controls\SubmitButton;
 use Nette\Forms\Controls\UploadControl;
+use ParagonIE\Sodium\Core\Curve25519\Ge\P1p1;
 use Swift_Mailer;
 use Swift_Message;
 use Swift_SmtpTransport;
@@ -92,9 +93,15 @@ class Mail extends BaseController {
         $this->mail_template_title = __('Contact Form Data');
         $this->mail_template_footer = '<a href="' . get_bloginfo( 'url' ) .' ">'.get_bloginfo( 'url' ) . '</a>';
 
-        $this->mailer = new Swift_Mailer(( new Swift_SmtpTransport( SMTP_HOST, SMTP_PORT, SMTP_ENCRYPTION ) )
-            ->setUsername( SMTP_USERNAME )
-            ->setPassword( SMTP_PASSWORD ));
+        $this->setMailer();
+    }
+
+    protected function setMailer() {
+        if(SMTP_HOST && SMTP_PORT && SMTP_USERNAME && SMTP_PASSWORD) {
+            $this->mailer = new Swift_Mailer(( new Swift_SmtpTransport( SMTP_HOST, SMTP_PORT, SMTP_ENCRYPTION ) )
+                ->setUsername( SMTP_USERNAME )
+                ->setPassword( SMTP_PASSWORD ));
+        }
     }
 
     /**
@@ -102,7 +109,7 @@ class Mail extends BaseController {
      *
      * @return $this
      */
-    public function send()
+    public function proceed()
     {
         $this->sendDataMail();
         if($this->form->options['send_confirm_mail']) $this->sendConfirmMail();
@@ -150,6 +157,7 @@ class Mail extends BaseController {
 
         $this->form->template = $this->form->success_template;
         $this->mailer->send( $message );
+        $this->send();
 
         return $this;
     }

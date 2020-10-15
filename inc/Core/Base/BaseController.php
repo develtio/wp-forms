@@ -29,8 +29,7 @@ class BaseController
         $this->plugin_modules_path = $this->plugin_path . 'inc/Modules';
 
         $this->managers = [
-            'develtio_forms' => 'Develtio forms',
-            'develtio_cleaner' => 'Develtio cleaner',
+            'develtio_forms' => 'Develtio forms'
         ];
 
         $this->setModules();
@@ -51,5 +50,10 @@ class BaseController
                 $this->modules[] = $info;
             }
         }
+
+        array_push($this->modules, [
+            'name' => 'JS Validation',
+            'options_name'     => 'js_validation',
+        ]);
     }
 }
