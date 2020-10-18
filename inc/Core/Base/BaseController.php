@@ -40,7 +40,7 @@ class BaseController
         if(is_dir($this->plugin_modules_path)) {
             $directories = glob($this->plugin_modules_path . '/*' , GLOB_ONLYDIR);
             foreach($directories as $directory) {
-                $info = get_file_data( $directory . '/init.php',
+                $info = get_file_data( $directory . '/Init.php',
                     array(
                         'name'     => 'Name',
                         'options_name'     => 'Options name',
