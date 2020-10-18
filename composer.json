@@ -1,5 +1,5 @@
 {
-    "name": "develtio-wp-forms",
+    "name": "develtio/develtio-wp-forms",
     "description": "Make forms doable",
     "type": "wordpress-muplugin",
     "license": "MIT",
