@@ -1,7 +1,7 @@
 <?php
 /**
-* @package  DeveltioForms
-*/
+ * @package  DeveltioForms
+ */
 namespace Develtio\WP\Forms\Modules\Forms;
 
 use Develtio\WP\Forms\Core\Base\BaseController;
@@ -97,10 +97,11 @@ class Mail extends BaseController {
     }
 
     protected function setMailer() {
-        if(SMTP_HOST && SMTP_PORT && SMTP_USER && SMTP_PASS) {
-            $this->mailer = new Swift_Mailer(( new Swift_SmtpTransport( SMTP_HOST, SMTP_PORT, SMTP_SECURE ) )
-                ->setUsername( SMTP_USER )
-                ->setPassword( SMTP_PASS ));
+
+        if(SMTP_HOST && SMTP_PORT && SMTP_USERNAME && SMTP_PASSWORD) {
+            $this->mailer = new Swift_Mailer(( new Swift_SmtpTransport( SMTP_HOST, SMTP_PORT, SMTP_ENCRYPTION ) )
+                ->setUsername( SMTP_USERNAME )
+                ->setPassword( SMTP_PASSWORD ));
         }
     }
 
@@ -109,7 +110,7 @@ class Mail extends BaseController {
      *
      * @return $this
      */
-    public function send()
+    public function proceed()
     {
         $this->sendDataMail();
         if($this->form->options['send_confirm_mail']) $this->sendConfirmMail();
@@ -157,7 +158,6 @@ class Mail extends BaseController {
 
         $this->form->template = $this->form->success_template;
         $this->mailer->send( $message );
-        $this->send();
 
         return $this;
     }

@@ -204,6 +204,7 @@ class CreateForm extends BaseController
             }
 
             if ( $value instanceof FileUpload ) {
+
                 if ( !empty( $_FILES[$key]['name'] ) ) {
                     $upload = wp_upload_bits( $_FILES[$key]['name'], null, file_get_contents( $_FILES[$key]['tmp_name'] ) );
 
