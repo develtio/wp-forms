@@ -109,7 +109,7 @@ class Mail extends BaseController {
      *
      * @return $this
      */
-    public function proceed()
+    public function send()
     {
         $this->sendDataMail();
         if($this->form->options['send_confirm_mail']) $this->sendConfirmMail();
