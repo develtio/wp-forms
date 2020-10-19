@@ -136,7 +136,7 @@ class Mail extends BaseController {
                 $file = $component->value;
 
                 if($file->hasFile()) {
-                    $attachment = Swift_Attachment::fromPath( $file->getTemporaryFile() )->setFilename( $file->getName() );
+                    $attachment = \Swift_Attachment::fromPath( $file->getTemporaryFile() )->setFilename( $file->getName() );
                 }
                 continue;
             }
