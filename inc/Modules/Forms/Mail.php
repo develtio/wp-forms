@@ -98,7 +98,7 @@ class Mail extends BaseController {
 
     protected function setMailer() {
         if(SMTP_HOST && SMTP_PORT && SMTP_USER && SMTP_PASS) {
-            $this->mailer = new Swift_Mailer(( new Swift_SmtpTransport( SMTP_HOST, SMTP_PORT, SMTP_SECUREs ) )
+            $this->mailer = new Swift_Mailer(( new Swift_SmtpTransport( SMTP_HOST, SMTP_PORT, SMTP_SECURE ) )
                 ->setUsername( SMTP_USER )
                 ->setPassword( SMTP_PASS ));
         }
