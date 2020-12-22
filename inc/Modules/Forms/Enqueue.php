@@ -23,7 +23,7 @@ class Enqueue extends BaseController
     {
         $option = get_option('develtio_plugin');
 
-        if ( $option['js_validation'] ) {
+        if ( array_key_exists('js_validation', $option)  && $option['js_validation']) {
             wp_enqueue_script( 'develtio-form', $this->plugin_url . 'dist/bundle.js' );
         }
     }

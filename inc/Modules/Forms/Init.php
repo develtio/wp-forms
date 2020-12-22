@@ -18,8 +18,6 @@ class Init extends BaseController {
     {
         $option = get_option('develtio_plugin');
 
-        if(!$option['develtio_forms']) return;
-
         $this->register_services();
     }
 
