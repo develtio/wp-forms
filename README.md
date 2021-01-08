@@ -34,6 +34,67 @@ if ( class_exists( '\Develtio\WP\Forms\Modules\Forms\CreateForm' ) ) {
 }
 ```
 
+## Use with AJAX ##
+We use the Nette From library to building the forms (https://doc.nette.org/en/3.0/forms)
+
+Example
+```php
+if ( class_exists( '\Develtio\WP\Forms\Modules\Forms\CreateForm' ) ) {
+    $options = [ 
+            'send_mail' => false, // enables / disables sending an email, enabled by default
+            'send_confirm_mail' => false, // enables / disables sending of confirmation email, disabled by default
+            'rest_api' => true, // enables / disables WP REST API endpoint for form
+            'create_cpt' => false, // enables / disables creation of CPT
+    ];
+
+        $instance = new \Develtio\WP\Forms\Modules\Forms\CreateForm('StepFirst', $options);
+        $instance->form->addText('client_id')
+            ->addRule($instance->form::REQUIRED, '<b>%name</b> is required');
+
+        $instance->form->addText('client_vat')
+            ->addRule($instance->form::REQUIRED, '<b>%name</b> is required');
+
+        $instance->form->addText('client_phone')
+            ->addRule($instance->form::REQUIRED, '<b>%name</b> is required')
+            ->addRule($instance->form::MAX_LENGTH, "<b>%name</b> shoud be not longer than 12 numbers', 12 ");
+
+        $instance->save();
+}
+```
+
+
+## Use with AJAX and Custom Handler ##
+We use the Nette From library to building the forms (https://doc.nette.org/en/3.0/forms)
+
+Example
+```php
+if ( class_exists( '\Develtio\WP\Forms\Modules\Forms\CreateForm' ) ) {
+    $options = [ 
+            'send_mail' => false, // enables / disables sending an email, enabled by default
+            'send_confirm_mail' => false, // enables / disables sending of confirmation email, disabled by default
+            'rest_api' => true, // enables / disables WP REST API endpoint for form
+            'create_cpt' => false, // enables / disables creation of CPT
+            'custom_handler' => [
+                'StepFirstHandleRequest',
+                plugin_dir_path(dirname(__FILE__)) . '/handlers/'
+            ]
+    ];
+
+        $instance = new \Develtio\WP\Forms\Modules\Forms\CreateForm('Step1', $options);
+        $instance->form->addText('client_id')
+            ->addRule($instance->form::REQUIRED, '<b>%name</b> is required');
+
+        $instance->form->addText('client_vat')
+            ->addRule($instance->form::REQUIRED, '<b>%name</b> is required');
+
+        $instance->form->addText('client_phone')
+            ->addRule($instance->form::REQUIRED, '<b>%name</b> is required')
+            ->addRule($instance->form::MAX_LENGTH, "<b>%name</b> shoud be not longer than 12 numbers', 12 ");
+
+        $instance->save();
+}
+```
+
 ## Templates ##
 
 ##### Form template #####
