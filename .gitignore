@@ -1,0 +1,10 @@
+# Ignore .env files
+.env
+
+# Editor files
+.idea
+
+# Ignore vendor lib
+vendor
+node_modules
+dist
