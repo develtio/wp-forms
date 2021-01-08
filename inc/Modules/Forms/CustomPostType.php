@@ -50,7 +50,6 @@ class CustomPostType extends BaseController
      */
     public function registerCustomPostTypes()
     {
-
         foreach ( $this->custom_post_types as $post_type ) {
             register_post_type( $post_type['name'], $post_type['args'] );
         }
@@ -65,6 +64,7 @@ class CustomPostType extends BaseController
      */
     public function storeCustomPostTypes( CreateForm $instance  )
     {
+
         $this->form_instance = $instance;
         $this->post_type_name = $instance->post_type_prefix . $instance->form_slug;
         $this->form_components = $instance->form->getComponents();
@@ -73,6 +73,7 @@ class CustomPostType extends BaseController
             var_dump( 'Length of form name must be smaller than 15 chars' );
             return;
         }
+
 
         array_push( $this->custom_post_types,
             [
@@ -92,7 +93,7 @@ class CustomPostType extends BaseController
         );
 
         if ( !empty( $this->custom_post_types ) ) {
-            add_action( 'init', [ $this, 'registerCustomPostTypes' ] );
+            add_action( 'init', [ $this, 'registerCustomPostTypes' ], 100 );
 
             $this->meta_box = new MetaBoxApi();
             $this->meta_box->init(

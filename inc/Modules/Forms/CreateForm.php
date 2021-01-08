@@ -73,12 +73,22 @@ class CreateForm extends BaseController
     public $mail;
 
     /**
+     * Rest Api class
+     * @var RestApi
+     */
+    public $rest_api;
+
+    public $custom_handler = null;
+
+    /**
      * Options form customizing features and properties
      * @var array
      */
     public $options = [
         'send_mail' => true,
-        'send_confirm_mail' => false
+        'send_confirm_mail' => false,
+        'rest_api' => false,
+        'create_cpt' => true
     ];
 
     /**
@@ -96,8 +106,18 @@ class CreateForm extends BaseController
         $this->mail = new Mail($this);
         $this->form_name = $form_name;
         $this->form_slug = sanitize_title( $form_name );
-        $this->custom_post_types = new CustomPostType();
 
+        if($this->options['create_cpt']) {
+            $this->custom_post_types = new CustomPostType();
+        }
+
+        if($this->options['rest_api']) {
+            $this->rest_api = new RestApi();
+        }
+
+        if(isset($this->options['custom_handler'])) {
+            $this->custom_handler = $this->options['custom_handler'];
+        }
     }
 
     /**
@@ -106,15 +126,22 @@ class CreateForm extends BaseController
     public function save()
     {
         $this->setShortcode();
-        $this->custom_post_types->storeCustomPostTypes( $this );
+        if($this->options['create_cpt']) {
+            $this->custom_post_types->storeCustomPostTypes($this);
+        }
+
+        if($this->options['rest_api']) {
+            $this->rest_api->exposeObject($this, $this->custom_handler);
+        }
 
         if ( isset( $_POST ) && !is_admin() && $this->form->isSubmitted() && $this->form->isSuccess() ) {
             $this->form_values = $this->form->getValues();
 
             if ( $this->options['send_mail'] ) $this->mail->proceed();
 
-            add_action( 'init', [ $this, 'saveFormData' ] );
-
+            if($this->options['create_cpt']) {
+                add_action('init', [$this, 'saveFormData']);
+            }
         }
     }
 

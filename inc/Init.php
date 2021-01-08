@@ -18,7 +18,6 @@ final class Init
             Core\Pages\Dashboard::class,
             Core\Base\Enqueue::class,
             Core\Base\SettingsLinks::class,
-
             Modules\Forms\Init::class,
         ];
     }
