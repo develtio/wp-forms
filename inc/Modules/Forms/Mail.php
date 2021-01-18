@@ -12,6 +12,7 @@ use ParagonIE\Sodium\Core\Curve25519\Ge\P1p1;
 use Swift_Mailer;
 use Swift_Message;
 use Swift_SmtpTransport;
+use Swift_Attachment;
 
 class Mail extends BaseController {
 
@@ -136,7 +137,7 @@ class Mail extends BaseController {
                 $file = $component->value;
 
                 if($file->hasFile()) {
-                    $attachment = \Swift_Attachment::fromPath( $file->getTemporaryFile() )->setFilename( $file->getName() );
+                    $attachment = Swift_Attachment::fromPath( $file->getTemporaryFile() )->setFilename( $file->getName() );
                 }
                 continue;
             }
