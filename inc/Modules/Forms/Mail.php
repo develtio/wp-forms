@@ -132,6 +132,10 @@ class Mail extends BaseController {
             if( $component instanceof SubmitButton) {
                 continue;
             }
+            
+            if(array_key_exists('excluded', $this->form->options) && in_array($component->name, $this->form->options['excluded'])) {
+                continue;
+            }
 
             if ( $component instanceof UploadControl ) {
                 $file = $component->value;

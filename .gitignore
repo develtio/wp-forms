@@ -3,6 +3,7 @@
 
 # Editor files
 .idea
+.history
 
 # Ignore vendor lib
 vendor
