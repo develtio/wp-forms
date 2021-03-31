@@ -152,17 +152,30 @@ class Mail extends BaseController {
         $view = new View();
         $maliContent = $view->render($this->mail_template, ['content' => $content, 'title' => $this->mail_template_title, 'footer' => $this->mail_template_footer]);
 
-        $message = ( new Swift_Message( $this->title ) )
-            ->setFrom( $this->from )
-            ->setTo( $this->to )
-            ->setBody( $maliContent, 'text/html' );
+        if($this->mailer) {
+            $message = ( new Swift_Message( $this->title ) )
+                ->setFrom( $this->from )
+                ->setTo( $this->to )
+                ->setBody( $maliContent, 'text/html' );
 
-        if($attachment) {
-            $message->attach( $attachment );
+            if ( $attachment ) {
+                $message->attach( $attachment );
+            }
+
+            $this->form->template = $this->form->success_template;
+            $this->mailer->send( $message );
+        } else {
+            $to      = $to = implode(", ", $this->to);
+            $from    = implode(", ", $this->from);
+            $subject = $this->title;
+            $message = $maliContent;
+            $headers[] = 'MIME-Version: 1.0';
+            $headers[] = 'Content-type: text/html; charset=UTF-8';
+            $headers[] = 'From: ' . $from;
+
+            $this->form->template = $this->form->success_template;
+            mail($to, $subject, $message, implode("\r\n", $headers));
         }
-
-        $this->form->template = $this->form->success_template;
-        $this->mailer->send( $message );
 
         return $this;
     }
