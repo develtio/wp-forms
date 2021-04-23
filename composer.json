@@ -13,11 +13,8 @@
     "authors": [
         {
             "name": "Develtio",
-            "homepage": "https://develtio.com"
-        },
-        {
-            "name": "Michał Malinowski",
-            "email": "mki.malinowski@gmail.com"
+            "homepage": "https://develtio.com",
+            "email": "info@develtio.com"
         }
     ],
     "autoload": {
