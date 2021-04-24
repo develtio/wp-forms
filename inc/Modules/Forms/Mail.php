@@ -2,6 +2,7 @@
 /**
  * @package  DeveltioForms
  */
+
 namespace Develtio\WP\Forms\Modules\Forms;
 
 use Develtio\WP\Forms\Core\Base\BaseController;
@@ -14,7 +15,8 @@ use Swift_Message;
 use Swift_SmtpTransport;
 use Swift_Attachment;
 
-class Mail extends BaseController {
+class Mail extends BaseController
+{
 
     /**
      * @var array
@@ -79,30 +81,43 @@ class Mail extends BaseController {
      * Mail constructor.
      * @param CreateForm $form
      */
-    public function __construct(CreateForm $form)
+    public function __construct( CreateForm $form )
     {
         parent::__construct();
+
+        add_action( 'phpmailer_init', [ $this, 'set_smpt' ] );
 
         $this->form = $form;
         $this->title = $this->form->form_name . ' ' . date( "Y-m-d h:i:sa", time() );
         $this->mail_template = $this->plugin_path . 'inc/Modules/Forms/templates/email.php';
         $this->confirm_template = $this->plugin_path . 'inc/Modules/Forms/templates/confirmEmail.php';
-        $this->confirm_mail_title = __('Thank you for contacting us');
-        $this->confirm_template_title = __('Thank you for contacting us!');
-        $this->confirm_template_content = __('We have received your enquiry and will respond to you within 24 hours.');
+        $this->confirm_mail_title = __( 'Thank you for contacting us' );
+        $this->confirm_template_title = __( 'Thank you for contacting us!' );
+        $this->confirm_template_content = __( 'We have received your enquiry and will respond to you within 24 hours.' );
 
-        $this->mail_template_title = __('Contact Form Data');
-        $this->mail_template_footer = '<a href="' . get_bloginfo( 'url' ) .' ">'.get_bloginfo( 'url' ) . '</a>';
+        $this->mail_template_title = __( 'Contact Form Data' );
+        $this->mail_template_footer = '<a href="' . get_bloginfo( 'url' ) . ' ">' . get_bloginfo( 'url' ) . '</a>';
 
-        $this->setMailer();
+//        $this->setMailer();
     }
 
-    protected function setMailer() {
+    public function set_smpt( $phpmailer )
+    {
 
-        if(SMTP_HOST && SMTP_PORT && SMTP_USERNAME && SMTP_PASSWORD) {
-            $this->mailer = new Swift_Mailer(( new Swift_SmtpTransport( SMTP_HOST, SMTP_PORT, SMTP_ENCRYPTION ) )
-                ->setUsername( SMTP_USERNAME )
-                ->setPassword( SMTP_PASSWORD ));
+        if (
+            defined( 'SMTP_HOST' ) && SMTP_HOST != '' &&
+            defined( 'SMTP_USER' ) && SMTP_USER != '' &&
+            defined( 'SMTP_PASS' ) && SMTP_PASS != ''
+        ) {
+            $phpmailer->isSMTP();
+            if ( defined( 'SMTP_HOST' ) ) $phpmailer->Host = SMTP_HOST;
+            if ( defined( 'SMTP_AUTH' ) ) $phpmailer->SMTPAuth = SMTP_AUTH;
+            if ( defined( 'SMTP_PORT' ) ) $phpmailer->Port = SMTP_PORT;
+            if ( defined( 'SMTP_USER' ) ) $phpmailer->Username = SMTP_USER;
+            if ( defined( 'SMTP_PASS' ) ) $phpmailer->Password = SMTP_PASS;
+            if ( defined( 'SMTP_SECURE' ) ) $phpmailer->SMTPSecure = SMTP_SECURE;
+            if ( defined( 'SMTP_FROM' ) ) $phpmailer->From = SMTP_FROM;
+            if ( defined( 'SMTP_NAME' ) ) $phpmailer->FromName = SMTP_NAME;
         }
     }
 
@@ -111,10 +126,10 @@ class Mail extends BaseController {
      *
      * @return $this
      */
-    public function proceed()
+    public function proceed(): Mail
     {
         $this->sendDataMail();
-        if($this->form->options['send_confirm_mail']) $this->sendConfirmMail();
+        if ( $this->form->options['send_confirm_mail'] ) $this->sendConfirmMail();
 
         return $this;
     }
@@ -123,59 +138,50 @@ class Mail extends BaseController {
      * Send mail for site owner
      * @return $this
      */
-    private function sendDataMail() {
+    private function sendDataMail(): Mail
+    {
         $content = '';
-        $attachment = false;
+        $attachments = false;
 
-        foreach ($this->form->form->getComponents() as $component) {
+        foreach ( $this->form->form->getComponents() as $component ) {
 
-            if( $component instanceof SubmitButton) {
+            if ( $component instanceof SubmitButton ) {
                 continue;
             }
-            
-            if(array_key_exists('excluded', $this->form->options) && in_array($component->name, $this->form->options['excluded'])) {
+
+            if ( array_key_exists( 'excluded', $this->form->options ) && in_array( $component->name, $this->form->options['excluded'] ) ) {
                 continue;
             }
 
             if ( $component instanceof UploadControl ) {
                 $file = $component->value;
 
-                if($file->hasFile()) {
-                    $attachment = Swift_Attachment::fromPath( $file->getTemporaryFile() )->setFilename( $file->getName() );
+                if ( $file->hasFile() ) {
+                    $file_path = dirname($file->getTemporaryFile());
+
+                    $new_file_uri = $file_path.'/'.$file->getName();
+                    $copy = copy($file->getTemporaryFile(), $new_file_uri);
+
+                    $attachment_file = $copy ? $new_file_uri : $file->getTemporaryFile();
+                    $attachments[] = $attachment_file;
                 }
                 continue;
             }
-
-            $content .= $this->form->getFormLabel($component) . ': ' . $component->value . '<br />';
+            $content .= $this->form->getFormLabel( $component ) . ': ' . $component->value . '<br />';
         }
 
         $view = new View();
-        $maliContent = $view->render($this->mail_template, ['content' => $content, 'title' => $this->mail_template_title, 'footer' => $this->mail_template_footer]);
+        $maliContent = $view->render( $this->mail_template, [ 'content' => $content, 'title' => $this->mail_template_title, 'footer' => $this->mail_template_footer ] );
 
-        if($this->mailer) {
-            $message = ( new Swift_Message( $this->title ) )
-                ->setFrom( $this->from )
-                ->setTo( $this->to )
-                ->setBody( $maliContent, 'text/html' );
+        $to = $to = implode( ", ", $this->to );
+        $subject = $this->title;
+        $message = $maliContent;
+        $headers[] = 'MIME-Version: 1.0';
+        $headers[] = 'Content-type: text/html; charset=UTF-8';
+        $headers[] = 'From: malin@wp.pl' ;
 
-            if ( $attachment ) {
-                $message->attach( $attachment );
-            }
-
-            $this->form->template = $this->form->success_template;
-            $this->mailer->send( $message );
-        } else {
-            $to      = $to = implode(", ", $this->to);
-            $from    = implode(", ", $this->from);
-            $subject = $this->title;
-            $message = $maliContent;
-            $headers[] = 'MIME-Version: 1.0';
-            $headers[] = 'Content-type: text/html; charset=UTF-8';
-            $headers[] = 'From: ' . $from;
-
-            $this->form->template = $this->form->success_template;
-            mail($to, $subject, $message, implode("\r\n", $headers));
-        }
+        $this->form->template = $this->form->success_template;
+        wp_mail( $to, $subject, $message, implode( "\r\n", $headers ), $attachments );
 
         return $this;
     }
@@ -184,14 +190,15 @@ class Mail extends BaseController {
      * Send an e-mail to the applicant
      * @return $this
      */
-    private function sendConfirmMail() {
+    private function sendConfirmMail()
+    {
         $view = new View();
 
-        $maliContent = $view->render($this->confirm_template, ['content' => $this->confirm_template_content,  'title' => $this->confirm_template_title]);
+        $maliContent = $view->render( $this->confirm_template, [ 'content' => $this->confirm_template_content, 'title' => $this->confirm_template_title ] );
 
         $message = ( new Swift_Message( $this->confirm_mail_title ) )
             ->setFrom( $this->from )
-            ->setTo( $this->form->form->getValues()[$this->confirm_mail_field])
+            ->setTo( $this->form->form->getValues()[$this->confirm_mail_field] )
             ->setBody( $maliContent, 'text/html' );
 
         $this->mailer->send( $message );
@@ -200,9 +207,9 @@ class Mail extends BaseController {
     }
 
     /**
-     * @param array $from
+     * @param string $from
      */
-    public function setFrom( $from ): void
+    public function setFrom( string $from ): void
     {
         $this->from = $from;
     }
@@ -210,31 +217,31 @@ class Mail extends BaseController {
     /**
      * @param array $to
      */
-    public function setTo( $to ): void
+    public function setTo( array $to ): void
     {
         $this->to = $to;
     }
 
     /**
-     * @param mixed $title
+     * @param string $title
      */
-    public function setTitle( $title ): void
+    public function setTitle( string $title ): void
     {
         $this->title = $title;
     }
 
     /**
-     * @param mixed $mail_template
+     * @param string $mail_template
      */
-    public function setMailTemplate( $mail_template ): void
+    public function setMailTemplate( string $mail_template ): void
     {
         $this->mail_template = $mail_template;
     }
 
     /**
-     * @param mixed $confirm_mail_field
+     * @param string $confirm_mail_field
      */
-    public function setConfirmMailField( $confirm_mail_field ): void
+    public function setConfirmMailField( string $confirm_mail_field ): void
     {
         $this->confirm_mail_field = $confirm_mail_field;
     }
@@ -274,7 +281,7 @@ class Mail extends BaseController {
     /**
      * @param string|void $mail_template_title
      */
-    public function setMailTemplateTitle( $mail_template_title ): void
+    public function setMailTemplateTitle( string $mail_template_title ): void
     {
         $this->mail_template_title = $mail_template_title;
     }

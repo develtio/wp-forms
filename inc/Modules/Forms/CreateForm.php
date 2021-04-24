@@ -111,10 +111,12 @@ class CreateForm extends BaseController
         if ( isset( $_POST ) && !is_admin() && $this->form->isSubmitted() && $this->form->isSuccess() ) {
             $this->form_values = $this->form->getValues();
 
+            // Save from data as wordpress post
+            add_action( 'init', [ $this, 'saveFormData' ] );
+
+            // Send form to mail
             if ( $this->options['send_mail'] ) $this->mail->proceed();
 
-            add_action( 'init', [ $this, 'saveFormData' ] );
-            
             if ( array_key_exists('redirect', $this->options) ) {
                 $url = $this->options['redirect'];
                 if( strpos( $this->options['redirect'], 'http' ) == false) {
@@ -211,6 +213,7 @@ class CreateForm extends BaseController
         );
 
         $post_id = wp_insert_post( $post_arr );
+        $filesPathArray = [];
 
         foreach ( $this->form_values as $key => $value ) {
 
@@ -222,20 +225,22 @@ class CreateForm extends BaseController
             if ( $value instanceof FileUpload ) {
 
                 if ( !empty( $_FILES[$key]['name'] ) ) {
+
                     $upload = wp_upload_bits( $_FILES[$key]['name'], null, file_get_contents( $_FILES[$key]['tmp_name'] ) );
 
                     if ( isset( $upload['error'] ) && $upload['error'] != 0 ) {
                         wp_die( 'There was an error uploading your file. The error is: ' . $upload['error'] );
                     } else {
                         update_post_meta( $post_id, $key, $upload );
+                        $filesPathArray[] = $upload['file'];
                     }
                 }
 
                 continue;
             }
-
             update_post_meta( $post_id, $key, sanitize_text_field( $value ) );
         }
+        update_post_meta( $post_id, 'files', json_encode($filesPathArray) );
     }
 
     /**

@@ -42,7 +42,16 @@ class CustomPostType extends BaseController
     /**
      * @var array
      */
-    protected $displayed_types = ['text', 'email'];
+    protected $displayed_types = [ 'text', 'email' ];
+
+    /**
+     * CustomPostType constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        add_action( 'before_delete_post', [ $this, 'removeAttachment' ] );
+    }
 
     /**
      * Register CPT
@@ -63,7 +72,7 @@ class CustomPostType extends BaseController
      * @param CreateForm $instance
      * @return $this
      */
-    public function storeCustomPostTypes( CreateForm $instance  )
+    public function storeCustomPostTypes( CreateForm $instance )
     {
         $this->form_instance = $instance;
         $this->post_type_name = $instance->post_type_prefix . $instance->form_slug;
@@ -118,15 +127,15 @@ class CustomPostType extends BaseController
      * @param $columns
      * @return mixed
      */
-    public function setTableColumns( $columns )
+    public function setTableColumns( $columns ): array
     {
         unset( $columns['date'] );
         unset( $columns['title'] );
 
         foreach ( $this->form_components as $component ) {
-            $label = $this->form_instance->getFormLabel($component);
+            $label = $this->form_instance->getFormLabel( $component );
 
-            if ( $label && in_array($component->getOption( 'type' ), $this->displayed_types) ) {
+            if ( $label && in_array( $component->getOption( 'type' ), $this->displayed_types ) ) {
                 $columns[$component->getControl()->name] = $label;
             }
         }
@@ -142,13 +151,34 @@ class CustomPostType extends BaseController
      * @param $column
      * @param $post_id
      */
-    function setColumnsData( $column, $post_id )
+    function setColumnsData( $column, $post_id ): void
     {
 
         foreach ( $this->form_components as $component ) {
-            if ( in_array($component->getOption( 'type' ), $this->displayed_types) ) {
+            if ( in_array( $component->getOption( 'type' ), $this->displayed_types ) ) {
                 if ( $column === $component->getControl()->name ) {
                     echo get_post_meta( $post_id, $component->getControl()->name, true );
+                }
+            }
+        }
+    }
+
+    /**
+     * Remove attached files while removing post
+     * @param $postId
+     */
+    public function removeAttachment( $postId ): void
+    {
+        $post_meta = get_post_meta( $postId );
+        foreach ( $post_meta as $key => $value ) {
+            if ( $key === 'files' ) {
+                foreach ( $value as $files ) {
+                    $filesArray = json_decode( $files );
+                    if($files && count($filesArray) > 0) {
+                        foreach ( $filesArray as $file ) {
+                            if ( file_exists( $file ) ) unlink( $file );
+                        }
+                    }
                 }
             }
         }
