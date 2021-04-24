@@ -73,6 +73,12 @@ class CreateForm extends BaseController
     public $mail;
 
     /**
+     * Mail instance
+     * @var Mail
+     */
+    public $csv_export;
+
+    /**
      * Options form customizing features and properties
      * @var array
      */
@@ -98,6 +104,9 @@ class CreateForm extends BaseController
         $this->form_slug = sanitize_title( $form_name );
         $this->custom_post_types = new CustomPostType();
 
+        if(isset($this->options['csv_export']) && $this->options['csv_export'] === true){
+            $this->csv_export = new CsvExport($form_name, $this->options['csv_export_fields']);
+        }
     }
 
     /**
@@ -111,21 +120,9 @@ class CreateForm extends BaseController
         if ( isset( $_POST ) && !is_admin() && $this->form->isSubmitted() && $this->form->isSuccess() ) {
             $this->form_values = $this->form->getValues();
 
-            // Save from data as wordpress post
-            add_action( 'init', [ $this, 'saveFormData' ] );
-
-            // Send form to mail
             if ( $this->options['send_mail'] ) $this->mail->proceed();
 
-            if ( array_key_exists('redirect', $this->options) ) {
-                $url = $this->options['redirect'];
-                if( strpos( $this->options['redirect'], 'http' ) == false) {
-                    $url = home_url() . '/' . $this->options['redirect'];
-                }
-
-                wp_redirect( $url );
-                exit;
-            }
+            add_action( 'init', [ $this, 'saveFormData' ] );
 
         }
     }
@@ -166,12 +163,6 @@ class CreateForm extends BaseController
     {
         $form = $form ? $form : $this->form;
         $vars = [];
-        
-        $vars['{ownErrors}'] = '';
-
-        foreach ($form->getOwnErrors() as $error) {
-            $vars['{ownErrors}'] .= '<p class="error">' . $error . '</p>';
-        }
 
         foreach ($this->form->getComponents() as $key => $value) {
             $vars['{' . $key . '_field}'] = $form[$key]->control;
@@ -213,7 +204,6 @@ class CreateForm extends BaseController
         );
 
         $post_id = wp_insert_post( $post_arr );
-        $filesPathArray = [];
 
         foreach ( $this->form_values as $key => $value ) {
 
@@ -225,22 +215,20 @@ class CreateForm extends BaseController
             if ( $value instanceof FileUpload ) {
 
                 if ( !empty( $_FILES[$key]['name'] ) ) {
-
                     $upload = wp_upload_bits( $_FILES[$key]['name'], null, file_get_contents( $_FILES[$key]['tmp_name'] ) );
 
                     if ( isset( $upload['error'] ) && $upload['error'] != 0 ) {
                         wp_die( 'There was an error uploading your file. The error is: ' . $upload['error'] );
                     } else {
                         update_post_meta( $post_id, $key, $upload );
-                        $filesPathArray[] = $upload['file'];
                     }
                 }
 
                 continue;
             }
+
             update_post_meta( $post_id, $key, sanitize_text_field( $value ) );
         }
-        update_post_meta( $post_id, 'files', json_encode($filesPathArray) );
     }
 
     /**

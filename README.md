@@ -34,6 +34,30 @@ if ( class_exists( '\Develtio\WP\Forms\Modules\Forms\CreateForm' ) ) {
 }
 ```
 
+Example with CSV export for CPT
+```
+    $options = [ 
+        'send_mail' => true, // enables / disables sending an email, enabled by default
+        'send_confirm_mail' => true // enables / disables sending of confirmation email, disabled by default
+        'csv_export' => true,
+        'csv_export_fields' => [
+            'id' => 'ID',
+            'date' => 'Created At',
+            'form_name' => 'Name',
+            'form_surname' => 'Surname',
+            'form_email' => 'Email',
+            'form_phone' => 'Phone',
+            'form_specialization' => 'Specialization',
+            'form_experience' => 'Experience',
+            'form_description' => 'Description',
+            'form_linkedin' => 'LinkedIn',
+            'form_cv' => 'CV',
+            'form_consent' => 'Consent'
+        ]
+    ];
+```
+
+
 ## Templates ##
 
 ##### Form template #####
