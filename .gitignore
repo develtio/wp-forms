@@ -9,4 +9,6 @@
 vendor
 node_modules
 dist
-
+composer.lock
+yarn.lock
+package-lock.json
