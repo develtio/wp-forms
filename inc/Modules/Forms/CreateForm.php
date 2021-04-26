@@ -229,6 +229,7 @@ class CreateForm extends BaseController
 
             update_post_meta( $post_id, $key, sanitize_text_field( $value ) );
         }
+        $this->template = $this->success_template;
     }
 
     /**
