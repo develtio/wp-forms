@@ -5,11 +5,8 @@
     "license": "MIT",
     "keywords": ["wordpress", "plugin", "forms", "nette"],
     "homepage": "https://develtio.com",
-    "repositories": [
-        {"type": "vcs", "url": "git@github.com:develtio/reCAPTCHA.git" }
-    ],
     "require": {
-        "contributte/recaptcha":"dev-wp-remote-get",
+        "contributte/recaptcha":"~3.4.1",
         "composer/installers": "~1.0",
         "nette/forms": "^3.0",
         "swiftmailer/swiftmailer": "^6.2"
