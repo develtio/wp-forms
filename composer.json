@@ -26,5 +26,15 @@
         "psr-4": {
             "Develtio\\WP\\Forms\\": "./inc"
         }
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "npm install",
+            "npm run build"
+        ],
+        "post-update-cmd": [
+            "npm install",
+            "npm run build"
+        ]
     }
 }
