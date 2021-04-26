@@ -15,10 +15,6 @@
         {
             "name": "Develtio",
             "homepage": "https://develtio.com"
-        },
-        {
-            "name": "Michał Malinowski",
-            "email": "mki.malinowski@gmail.com"
         }
     ],
     "minimum-stability": "dev",
