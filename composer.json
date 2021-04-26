@@ -5,11 +5,8 @@
     "license": "MIT",
     "keywords": ["wordpress", "plugin", "forms", "nette"],
     "homepage": "https://develtio.com",
-    "repositories": [
-        {"type": "vcs", "url": "git@github.com:develtio/reCAPTCHA.git" }
-    ],
     "require": {
-        "contributte/recaptcha":"dev-wp-remote-get",
+        "contributte/recaptcha":"~3.4.1",
         "composer/installers": "~1.0",
         "nette/forms": "^3.0",
         "swiftmailer/swiftmailer": "^6.2"
@@ -24,9 +21,20 @@
             "email": "mki.malinowski@gmail.com"
         }
     ],
+    "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
             "Develtio\\WP\\Forms\\": "./inc"
         }
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "npm install",
+            "npm run build"
+        ],
+        "post-update-cmd": [
+            "npm install",
+            "npm run build"
+        ]
     }
 }
