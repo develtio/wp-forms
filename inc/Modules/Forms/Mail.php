@@ -178,7 +178,7 @@ class Mail extends BaseController
         $message = $maliContent;
         $headers[] = 'MIME-Version: 1.0';
         $headers[] = 'Content-type: text/html; charset=UTF-8';
-        $headers[] = 'From: malin@wp.pl' ;
+        $headers[] = 'From: ' . $this->from ;
 
         $this->form->template = $this->form->success_template;
         wp_mail( $to, $subject, $message, implode( "\r\n", $headers ), $attachments );
