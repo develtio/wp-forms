@@ -24,6 +24,7 @@
             "email": "mki.malinowski@gmail.com"
         }
     ],
+    "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
             "Develtio\\WP\\Forms\\": "./inc"
