@@ -122,6 +122,16 @@ class CreateForm extends BaseController
 
             if ( $this->options['send_mail'] ) $this->mail->proceed();
 
+            if ( array_key_exists('redirect', $this->options) ) {
+                $url = $this->options['redirect'];
+                if( strpos( $this->options['redirect'], 'http' ) == false) {
+                    $url = home_url() . '/' . $this->options['redirect'];
+                }
+
+                wp_redirect( $url );
+                exit;
+            }
+
             add_action( 'init', [ $this, 'saveFormData' ] );
 
         }
