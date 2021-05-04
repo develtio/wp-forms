@@ -174,6 +174,12 @@ class CreateForm extends BaseController
         $form = $form ? $form : $this->form;
         $vars = [];
 
+        $vars['{ownErrors}'] = '';
+
+        foreach ($form->getOwnErrors() as $error) {
+            $vars['{ownErrors}'] .= '<p class="error">' . $error . '</p>';
+        }
+
         foreach ($this->form->getComponents() as $key => $value) {
             $vars['{' . $key . '_field}'] = $form[$key]->control;
             $vars['{' . $key . '_error}'] = $form[$key]->error ? '<p class="error">' . $form[$key]->error . '</p>' : '';
