@@ -167,6 +167,9 @@ class Mail extends BaseController
                 }
                 continue;
             }
+
+            is_array($component->value)? $value = implode(", ", $component->value) : $value = $component->value;
+
             $content .= $this->form->getFormLabel( $component ) . ': ' . $component->value . '<br />';
         }
 

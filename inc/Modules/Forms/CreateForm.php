@@ -132,7 +132,7 @@ class CreateForm extends BaseController
                 exit;
             }
 
-            add_action( 'init', [ $this, 'saveFormData' ] );
+            add_action( 'init', [ $this, 'saveFormData' ], 20 );
 
         }
     }

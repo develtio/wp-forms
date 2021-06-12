@@ -101,7 +101,7 @@ class CustomPostType extends BaseController
         );
 
         if ( !empty( $this->custom_post_types ) ) {
-            add_action( 'init', [ $this, 'registerCustomPostTypes' ] );
+            add_action( 'init', [ $this, 'registerCustomPostTypes' ], 20 );
 
             $this->meta_box = new MetaBoxApi();
             $this->meta_box->init(

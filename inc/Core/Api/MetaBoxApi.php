@@ -102,6 +102,7 @@ class MetaBoxApi
             case 'hidden':
             case 'text':
             case 'email':
+            case 'select':
             case 'textarea':
                 $value = '<p>'. esc_html( get_post_meta( $post_id, $field['name'], true ) ) . '</p>';
                 break;
