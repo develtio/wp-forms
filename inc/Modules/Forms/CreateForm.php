@@ -98,7 +98,7 @@ class CreateForm extends BaseController
 
         $this->success_template = '<p class="form__success">' . __('Thank you for contacting us. We have received your enquiry and will respond to you within 24 hours.') . ' </p>';
         $this->options = array_merge( $this->options, $options );
-        $this->form = new Form;
+        $this->form = new Form(sanitize_title($form_name));
         $this->mail = new Mail($this);
         $this->form_name = $form_name;
         $this->form_slug = sanitize_title( $form_name );
