@@ -199,12 +199,11 @@ class Mail extends BaseController
 
         $maliContent = $view->render( $this->confirm_template, [ 'content' => $this->confirm_template_content, 'title' => $this->confirm_template_title ] );
 
-        $message = ( new Swift_Message( $this->confirm_mail_title ) )
-            ->setFrom( $this->from )
-            ->setTo( $this->form->form->getValues()[$this->confirm_mail_field] )
-            ->setBody( $maliContent, 'text/html' );
+        $headers[] = 'MIME-Version: 1.0';
+        $headers[] = 'Content-type: text/html; charset=UTF-8';
+        $headers[] = 'From: ' . $this->from ;
 
-        $this->mailer->send( $message );
+        wp_mail( $this->form->form->getValues()[$this->confirm_mail_field], $this->confirm_mail_title, $maliContent, implode( "\r\n", $headers ) );
 
         return $this;
     }
