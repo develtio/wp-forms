@@ -170,7 +170,7 @@ class Mail extends BaseController
 
             is_array($component->value)? $value = implode(", ", $component->value) : $value = $component->value;
 
-            $content .= $this->form->getFormLabel( $component ) . ': ' . $value . '<br />';
+            $content .= $this->form->getFormLabel($component) . ': ' . apply_filters('develtio_forms_field_value', $value, $component->getHtmlName()) . '<br />';
         }
 
         $view = new View();
