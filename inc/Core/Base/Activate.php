@@ -15,7 +15,9 @@ class Activate
             return;
         }
 
-        $default = [];
+        $default = [
+            'js_validation' => 1
+        ];
 
         update_option('develtio_plugin', $default);
     }

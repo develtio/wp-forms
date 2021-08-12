@@ -37,19 +37,19 @@ class BaseController
 
     public function setModules() {
 
-        if(is_dir($this->plugin_modules_path)) {
-            $directories = glob($this->plugin_modules_path . '/*' , GLOB_ONLYDIR);
-            foreach($directories as $directory) {
-                $info = get_file_data( $directory . '/Init.php',
-                    array(
-                        'name'     => 'Name',
-                        'options_name'     => 'Options name',
-                    )
-                );
-
-                $this->modules[] = $info;
-            }
-        }
+//        if(is_dir($this->plugin_modules_path)) {
+//            $directories = glob($this->plugin_modules_path . '/*' , GLOB_ONLYDIR);
+//            foreach($directories as $directory) {
+//                $info = get_file_data( $directory . '/Init.php',
+//                    array(
+//                        'name'     => 'Name',
+//                        'options_name'     => 'Options name',
+//                    )
+//                );
+//
+//                $this->modules[] = $info;
+//            }
+//        }
 
         array_push($this->modules, [
             'name' => 'JS Validation',

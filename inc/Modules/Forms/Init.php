@@ -16,8 +16,6 @@ class Init extends BaseController {
 
     public function init()
     {
-        $option = get_option('develtio_plugin');
-
         $this->register_services();
     }
 
