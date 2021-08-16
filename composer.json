@@ -1,36 +1,35 @@
 {
-    "name": "develtio/develtio-wp-forms",
-    "description": "Make forms doable",
-    "type": "wordpress-muplugin",
-    "license": "MIT",
-    "keywords": ["wordpress", "plugin", "forms", "nette"],
-    "homepage": "https://develtio.com",
-    "require": {
-        "contributte/recaptcha":"*",
-        "composer/installers": "~1.0",
-        "nette/forms": "^3.0",
-        "swiftmailer/swiftmailer": "^6.2"
-    },
-    "authors": [
-        {
-            "name": "Develtio",
-            "homepage": "https://develtio.com"
-        }
-    ],
-    "minimum-stability": "dev",
-    "autoload": {
-        "psr-4": {
-            "Develtio\\WP\\Forms\\": "./inc"
-        }
-    },
-    "scripts": {
-        "post-install-cmd": [
-            "npm install",
-            "npm run build"
-        ],
-        "post-update-cmd": [
-            "npm install",
-            "npm run build"
-        ]
+  "name": "develtio/develtio-wp-forms",
+  "description": "Make forms doable",
+  "type": "wordpress-muplugin",
+  "license": "MIT",
+  "keywords": ["wordpress", "plugin", "forms", "nette"],
+  "homepage": "https://develtio.com",
+  "require": {
+    "contributte/recaptcha":"*",
+    "composer/installers": "~1.0",
+    "nette/forms": "^3.0"
+  },
+  "authors": [
+    {
+      "name": "Develtio",
+      "homepage": "https://develtio.com"
     }
+  ],
+  "minimum-stability": "dev",
+  "autoload": {
+    "psr-4": {
+      "Develtio\\WP\\Forms\\": "./inc"
+    }
+  },
+  "scripts": {
+    "post-install-cmd": [
+      "npm install",
+      "npm run build"
+    ],
+    "post-update-cmd": [
+      "npm install",
+      "npm run build"
+    ]
+  }
 }

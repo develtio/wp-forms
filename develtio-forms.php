@@ -1,49 +1,82 @@
 <?php
+
 /**
- * Develtio Forms
+ * The plugin bootstrap file
  *
- * Plugin Name: Develtio Forms
- * Plugin URI:  https://develtio.com
- * Description: Make forms easier to develop
- * Version:     1.0
- * Author:      Develtio
- * Author URI:  https://develtio.com
- * License:     GPLv2 or later
- * License URI: http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
- * Text Domain: develtio-forms
- * Domain Path: /lang
+ * This file is read by WordPress to generate the plugin information in the plugin
+ * admin area. This file also includes all of the dependencies used by the plugin,
+ * registers the activation and deactivation functions, and defines a function
+ * that starts the plugin.
+ *
+ * @link              https://develtio.com
+ * @since             1.0.0
+ * @package           Develtio_Forms
+ *
+ * @wordpress-plugin
+ * Plugin Name:       Develtio Forms
+ * Plugin URI:        https://github.com/develtio/wp-forms
+ * Description:       This is a short description of what the plugin does. It's displayed in the WordPress admin area.
+ * Version:           1.0.0
+ * Author:            Develtio
+ * Author URI:        https://develtio.com
+ * License:           GPL-2.0+
+ * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
+ * Text Domain:       develtio-forms
+ * Domain Path:       /languages
  */
 
-// Abort if this file is called directly
-defined( 'ABSPATH' ) or die( 'Hey, what are you doing here?' );
-
-// Composer autoloader
-if ( is_readable( __DIR__ . '/vendor/autoload.php' ) ) {
-    require_once __DIR__ . '/vendor/autoload.php';
+// If this file is called directly, abort.
+if ( ! defined( 'WPINC' ) ) {
+	die;
 }
 
 /**
- * Plugin activation function
+ * Currently plugin version.
+ * Start at version 1.0.0 and use SemVer - https://semver.org
+ * Rename this for your plugin and update it as you release new versions.
  */
-function activate_develtio_plugin()
-{
-    \Develtio\WP\Forms\Core\Base\Activate::activate();
-}
-
-register_activation_hook( __FILE__, 'activate_develtio_plugin' );
+define( 'DEVELTIO_FORMS_VERSION', '1.0.0' );
 
 /**
- * Plugin deactivation function
+ * The code that runs during plugin activation.
+ * This action is documented in includes/class-develtio-forms-activator.php
  */
-function deactivate_develtio_plugin()
-{
-    \Develtio\WP\Forms\Core\Base\Deactivate::deactivate();
+function activate_develtio_forms() {
+	require_once plugin_dir_path( __FILE__ ) . 'includes/class-develtio-forms-activator.php';
+	Develtio_Forms_Activator::activate();
 }
-register_deactivation_hook( __FILE__, 'deactivate_develtio_plugin' );
 
 /**
- *  Init all core classes
+ * The code that runs during plugin deactivation.
+ * This action is documented in includes/class-develtio-forms-deactivator.php
  */
-if ( class_exists( 'Develtio\\WP\\Forms\\Init' ) ) {
-    \Develtio\WP\Forms\Init::register_services();
+function deactivate_develtio_forms() {
+	require_once plugin_dir_path( __FILE__ ) . 'includes/class-develtio-forms-deactivator.php';
+	Develtio_Forms_Deactivator::deactivate();
 }
+
+register_activation_hook( __FILE__, 'activate_develtio_forms' );
+register_deactivation_hook( __FILE__, 'deactivate_develtio_forms' );
+
+/**
+ * The core plugin class that is used to define internationalization,
+ * admin-specific hooks, and public-facing site hooks.
+ */
+require plugin_dir_path( __FILE__ ) . 'includes/class-develtio-forms.php';
+
+/**
+ * Begins execution of the plugin.
+ *
+ * Since everything within the plugin is registered via hooks,
+ * then kicking off the plugin from this point in the file does
+ * not affect the page life cycle.
+ *
+ * @since    1.0.0
+ */
+function run_develtio_forms() {
+
+	$plugin = new Develtio_Forms();
+	$plugin->run();
+
+}
+run_develtio_forms();
