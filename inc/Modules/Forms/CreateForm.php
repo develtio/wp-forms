@@ -232,7 +232,7 @@ class CreateForm extends BaseController
             if ( $value instanceof FileUpload ) {
 
                 if ( !empty( $_FILES[$key]['name'] ) ) {
-                    $upload = wp_upload_bits( $_FILES[$key]['name'], null, file_get_contents( $_FILES[$key]['tmp_name'] ) );
+                    $upload = wp_upload_bits( $this->generateRandomString(5) . '-' . $_FILES[$key]['name'], null, file_get_contents( $_FILES[$key]['tmp_name'] ) );
 
                     if ( isset( $upload['error'] ) && $upload['error'] != 0 ) {
                         wp_die( 'There was an error uploading your file. The error is: ' . $upload['error'] );
@@ -247,6 +247,21 @@ class CreateForm extends BaseController
             update_post_meta( $post_id, $key, sanitize_text_field( $value ) );
         }
         $this->template = $this->success_template;
+    }
+
+    /**
+     * @param int $length
+     * @return string
+     */
+    public function generateRandomString($length = 20): string
+    {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $charactersLength = strlen($characters);
+        $randomString = '';
+        for ($i = 0; $i < $length; $i++) {
+            $randomString .= $characters[rand(0, $charactersLength - 1)];
+        }
+        return $randomString;
     }
 
     /**
