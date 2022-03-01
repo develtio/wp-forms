@@ -3,11 +3,16 @@
     "description": "Make forms doable",
     "type": "wordpress-muplugin",
     "license": "MIT",
-    "keywords": ["wordpress", "plugin", "forms", "nette"],
+    "keywords": [
+        "wordpress",
+        "plugin",
+        "forms",
+        "nette"
+    ],
     "homepage": "https://develtio.com",
     "require": {
-        "contributte/recaptcha":"*",
-        "composer/installers": "~1.0",
+        "contributte/recaptcha": "*",
+        "composer/installers": "^1.0 || ^2.0",
         "nette/forms": "^3.0",
         "swiftmailer/swiftmailer": "^6.2"
     },
